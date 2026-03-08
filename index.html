@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notepad</title>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+
+body{
+font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
+margin:0;
+background:#f5f6f8;
+height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+/* TOP BAR */
+
+#topbar{
+background:white;
+padding:10px;
+display:flex;
+gap:8px;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+#search{
+flex:1;
+padding:8px;
+border-radius:6px;
+border:1px solid #ddd;
+font-size:14px;
+}
+
+.topbtn{
+padding:6px 10px;
+border:1px solid #ccc;
+background:white;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+}
+
+/* LAYOUT */
+
+#container{
+flex:1;
+display:flex;
+overflow:hidden;
+}
+
+/* SIDEBAR */
+
+#sidebar{
+width:260px;
+background:white;
+border-right:1px solid #eee;
+display:flex;
+flex-direction:column;
+}
+
+#newPage{
+margin:10px;
+padding:8px;
+border:none;
+border-radius:6px;
+background:#2f7ef7;
+color:white;
+cursor:pointer;
+}
+
+#pages{
+flex:1;
+overflow:auto;
+}
+
+.section{
+font-size:12px;
+font-weight:600;
+color:#666;
+padding:6px 10px;
+background:#fafafa;
+border-top:1px solid #eee;
+}
+
+.page{
+padding:10px;
+cursor:pointer;
+border-bottom:1px solid #f1f1f1;
+font-size:14px;
+display:flex;
+justify-content:space-between;
+}
+
+.page:hover{
+background:#f5f6f8;
+}
+
+.active{
+background:#e8f0ff;
+}
+
+.pin{
+font-size:12px;
+color:#999;
+}
+
+/* EDITOR */
+
+#editorCard{
+flex:1;
+margin:15px;
+background:white;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.06);
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+#title{
+border:none;
+border-bottom:1px solid #eee;
+padding:12px;
+font-size:16px;
+font-weight:600;
+outline:none;
+}
+
+#mode{
+padding:6px 12px;
+border-bottom:1px solid #eee;
+display:flex;
+gap:6px;
+font-size:13px;
+}
+
+#mode button{
+padding:4px 8px;
+border:1px solid #ccc;
+background:white;
+border-radius:4px;
+cursor:pointer;
+}
+
+#deleteBtn{
+margin-left:auto;
+background:#ffebeb;
+border:1px solid #ffbaba;
+}
+
+#content{
+flex:1;
+border:none;
+padding:12px;
+font-family:monospace;
+font-size:14px;
+outline:none;
+resize:none;
+}
+
+#preview{
+flex:1;
+padding:12px;
+overflow:auto;
+display:none;
+}
+
+/* META PANELS */
+
+#tags,#stats,#backlinks{
+padding:6px 12px;
+font-size:12px;
+border-top:1px solid #eee;
+color:#555;
+}
+
+/* MARKDOWN */
+
+#preview h1{font-size:24px}
+#preview h2{font-size:20px}
+#preview pre{background:#f1f1f1;padding:10px;border-radius:6px}
+#preview code{background:#f1f1f1;padding:2px 4px;border-radius:4px}
+#preview ul{padding-left:20px}
+
+/* COMMAND PALETTE */
+
+#palette{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+width:320px;
+border-radius:8px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+display:none;
+flex-direction:column;
+}
+
+#palette input{
+border:none;
+border-bottom:1px solid #eee;
+padding:10px;
+outline:none;
+}
+
+.paletteItem{
+padding:8px;
+cursor:pointer;
+}
+
+.paletteItem:hover{
+background:#f5f6f8;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+#container{
+flex-direction:column;
+}
+
+#sidebar{
+width:100%;
+height:160px;
+border-right:none;
+border-bottom:1px solid #eee;
+}
+
+#editorCard{
+margin:10px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="topbar">
+
+<input id="search" placeholder="Search notes (Ctrl + /)">
+
+<button class="topbtn" onclick="exportNotes()">Export</button>
+
+<button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
+
+<input type="file" id="importFile" style="display:none">
+
+</div>
+
+<div id="container">
+
+<div id="sidebar">
+
+<button id="newPage">+ New Page</button>
+
+<div id="pages"></div>
+
+</div>
+
+<div id="editorCard">
+
+<input id="title" placeholder="Title">
+
+<div id="mode">
+
+<button onclick="setMode('edit')">Edit</button>
+<button onclick="setMode('preview')">Preview</button>
+<button onclick="togglePin()">Pin</button>
+
+<button id="deleteBtn" onclick="deleteNote()">Delete</button>
+
+</div>
+
+<textarea id="content"></textarea>
+
+<div id="preview"></div>
+
+<div id="tags"></div>
+<div id="stats"></div>
+<div id="backlinks"></div>
+
+</div>
+
+</div>
+
+<div id="palette">
+
+<input id="paletteSearch" placeholder="Jump to note...">
+
+<div id="paletteList"></div>
+
+</div>
+
+<script>
+
+let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
+let current = null
+let mode="edit"
+
+function save(){
+localStorage.setItem("markdownNotes",JSON.stringify(notes))
+}
+
+/* TAGS */
+
+function getTags(text){
+let m=text.match(/#\w+/g)
+return m?[...new Set(m)]:[]
+}
+
+/* LINKS */
+
+function getLinks(text){
+let m=text.match(/\[\[(.*?)\]\]/g)
+return m?m.map(v=>v.replace("[[","").replace("]]","")):[]
+}
+
+/* SIDEBAR */
+
+function renderPages(filter=""){
+
+let pinned=[]
+let recent=[]
+let all=[]
+
+notes.forEach(n=>{
+if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
+if(n.pinned) pinned.push(n)
+else if(Date.now()-n.updated<86400000) recent.push(n)
+else all.push(n)
+})
+
+pinned.sort((a,b)=>b.updated-a.updated)
+recent.sort((a,b)=>b.updated-a.updated)
+all.sort((a,b)=>b.updated-a.updated)
+
+pages.innerHTML=""
+
+function renderSection(name,list){
+
+if(!list.length) return
+
+let s=document.createElement("div")
+s.className="section"
+s.textContent=name
+pages.appendChild(s)
+
+list.forEach(n=>{
+
+let div=document.createElement("div")
+div.className="page"+(n.id===current?" active":"")
+
+let t=document.createElement("span")
+t.textContent=n.title
+
+let p=document.createElement("span")
+p.className="pin"
+p.textContent=n.pinned?"📌":""
+
+div.appendChild(t)
+div.appendChild(p)
+
+div.onclick=()=>openNote(n.id)
+
+pages.appendChild(div)
+
+})
+
+}
+
+renderSection("Pinned",pinned)
+renderSection("Recent",recent)
+renderSection("All Notes",all)
+
+}
+
+/* NEW NOTE */
+
+newPage.onclick=()=>{
+
+let id=Date.now()
+
+let note={
+id:id,
+title:"Untitled Note",
+content:"",
+created:id,
+updated:id,
+pinned:false
+}
+
+notes.unshift(note)
+save()
+openNote(id)
+
+}
+
+/* OPEN */
+
+function openNote(id){
+
+current=id
+let note=notes.find(n=>n.id===id)
+
+title.value=note.title
+content.value=note.content
+
+renderMeta(note)
+
+if(mode==="preview")renderPreview()
+
+renderPages()
+
+}
+
+/* META PANELS */
+
+function renderMeta(note){
+
+let tags=getTags(note.content)
+tagsDiv.innerText="Tags: "+tags.join(" ")
+
+let links=getLinks(note.content)
+
+let words=note.content.split(/\s+/).filter(Boolean).length
+let chars=note.content.length
+
+stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
+
+let refs=[]
+
+notes.forEach(n=>{
+if(n.id!==note.id && getLinks(n.content).includes(note.title)){
+refs.push(n.title)
+}
+})
+
+backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
+
+}
+
+/* TITLE */
+
+title.oninput=e=>{
+
+let n=notes.find(x=>x.id===current)
+
+n.title=e.target.value
+n.updated=Date.now()
+
+save()
+renderPages()
+
+}
+
+/* CONTENT */
+
+content.oninput=e=>{
+
+let n=notes.find(x=>x.id===current)
+
+n.content=e.target.value
+n.updated=Date.now()
+
+save()
+
+renderMeta(n)
+
+if(mode==="preview")renderPreview()
+
+}
+
+/* PIN */
+
+function togglePin(){
+
+let n=notes.find(x=>x.id===current)
+n.pinned=!n.pinned
+save()
+renderPages()
+
+}
+
+/* DELETE */
+
+function deleteNote(){
+
+if(!confirm("Delete note?")) return
+
+notes=notes.filter(n=>n.id!==current)
+
+save()
+
+if(notes.length) openNote(notes[0].id)
+
+renderPages()
+
+}
+
+/* MARKDOWN */
+
+function renderPreview(){
+
+let html=marked.parse(content.value)
+
+html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
+
+let note=notes.find(n=>n.title===name)
+
+if(!note){
+
+let id=Date.now()
+
+note={id,title:name,content:"",created:id,updated:id,pinned:false}
+
+notes.push(note)
+save()
+
+}
+
+return "<a href='#' onclick=\"openNote("+note.id+")\">"+name+"</a>"
+
+})
+
+preview.innerHTML=html
+
+}
+
+/* MODE */
+
+function setMode(m){
+
+mode=m
+
+if(m==="edit"){
+
+content.style.display="block"
+preview.style.display="none"
+
+}else{
+
+renderPreview()
+
+content.style.display="none"
+preview.style.display="block"
+
+}
+
+}
+
+/* SEARCH */
+
+search.oninput=e=>{
+renderPages(e.target.value.toLowerCase())
+}
+
+/* EXPORT */
+
+function exportNotes(){
+
+let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"})
+let a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download="notes_export.json"
+a.click()
+
+}
+
+/* IMPORT */
+
+importFile.onchange=e=>{
+
+let f=e.target.files[0]
+
+let r=new FileReader()
+
+r.onload=function(evt){
+
+notes=JSON.parse(evt.target.result)
+
+save()
+
+openNote(notes[0].id)
+
+renderPages()
+
+}
+
+r.readAsText(f)
+
+}
+
+/* COMMAND PALETTE */
+
+document.addEventListener("keydown",e=>{
+
+if(e.ctrlKey && e.key==="/"){
+e.preventDefault()
+search.focus()
+}
+
+if(e.ctrlKey && e.key==="k"){
+e.preventDefault()
+palette.style.display="flex"
+paletteSearch.focus()
+renderPalette()
+}
+
+})
+
+function renderPalette(filter=""){
+
+paletteList.innerHTML=""
+
+notes.filter(n=>n.title.toLowerCase().includes(filter))
+.forEach(n=>{
+
+let d=document.createElement("div")
+d.className="paletteItem"
+d.textContent=n.title
+
+d.onclick=()=>{
+openNote(n.id)
+palette.style.display="none"
+}
+
+paletteList.appendChild(d)
+
+})
+
+}
+
+paletteSearch.oninput=e=>{
+renderPalette(e.target.value.toLowerCase())
+}
+
+/* INIT */
+
+if(notes.length===0){
+
+let id=Date.now()
+
+notes.push({
+id:id,
+title:"Welcome",
+content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",
+created:id,
+updated:id,
+pinned:false
+})
+
+save()
+
+}
+
+openNote(notes[0].id)
+renderPages()
+
+</script>
+
+</body>
+</html>
