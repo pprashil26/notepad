@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad</title>
+<title>Markdown Knowledge Notepad</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -218,7 +218,7 @@ cursor:pointer;
 background:#f5f6f8;
 }
 
-/* MOBILE */
+/* MOBILE OPTIMIZATIONS */
 
 @media(max-width:700px){
 
@@ -228,15 +228,75 @@ flex-direction:column;
 
 #sidebar{
 width:100%;
-height:160px;
+height:auto;
+max-height:160px;
+display:flex;
+overflow-x:auto;
 border-right:none;
 border-bottom:1px solid #eee;
 }
 
-#editorCard{
-margin:10px;
+#pages{
+display:flex;
+gap:6px;
+flex-wrap:nowrap;
 }
 
+.page{
+flex:0 0 auto;
+border-bottom:none;
+border-right:1px solid #eee;
+}
+
+.section{
+display:none;
+}
+
+#editorCard{
+margin:5px;
+}
+
+#title{
+font-size:14px;
+padding:8px;
+}
+
+#content,#preview{
+font-size:13px;
+padding:8px;
+}
+
+#mode button{
+padding:3px 6px;
+font-size:12px;
+}
+
+#tags,#stats,#backlinks{
+font-size:11px;
+padding:4px 8px;
+}
+
+#preview{
+min-height:200px;
+}
+
+}
+
+@media(max-width:400px){
+#topbar{
+flex-direction:column;
+gap:4px;
+padding:6px;
+}
+#search{
+width:100%;
+font-size:13px;
+padding:6px;
+}
+.topbtn{
+width:100%;
+font-size:12px;
+}
 }
 
 </style>
@@ -310,27 +370,16 @@ function save(){
 localStorage.setItem("markdownNotes",JSON.stringify(notes))
 }
 
-/* TAGS */
+/* TAGS & LINKS */
 
-function getTags(text){
-let m=text.match(/#\w+/g)
-return m?[...new Set(m)]:[]
-}
+function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
+function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
-/* LINKS */
-
-function getLinks(text){
-let m=text.match(/\[\[(.*?)\]\]/g)
-return m?m.map(v=>v.replace("[[","").replace("]]","")):[]
-}
-
-/* SIDEBAR */
+/* SIDEBAR RENDER */
 
 function renderPages(filter=""){
 
-let pinned=[]
-let recent=[]
-let all=[]
+let pinned=[],recent=[],all=[]
 
 notes.forEach(n=>{
 if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
@@ -346,322 +395,107 @@ all.sort((a,b)=>b.updated-a.updated)
 pages.innerHTML=""
 
 function renderSection(name,list){
-
 if(!list.length) return
-
 let s=document.createElement("div")
 s.className="section"
 s.textContent=name
 pages.appendChild(s)
-
 list.forEach(n=>{
-
 let div=document.createElement("div")
 div.className="page"+(n.id===current?" active":"")
-
-let t=document.createElement("span")
-t.textContent=n.title
-
-let p=document.createElement("span")
-p.className="pin"
-p.textContent=n.pinned?"📌":""
-
-div.appendChild(t)
-div.appendChild(p)
-
+let t=document.createElement("span");t.textContent=n.title
+let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"📌":""
+div.appendChild(t);div.appendChild(p)
 div.onclick=()=>openNote(n.id)
-
 pages.appendChild(div)
-
-})
-
-}
-
+})}
 renderSection("Pinned",pinned)
 renderSection("Recent",recent)
 renderSection("All Notes",all)
-
 }
 
 /* NEW NOTE */
 
 newPage.onclick=()=>{
-
 let id=Date.now()
-
-let note={
-id:id,
-title:"Untitled Note",
-content:"",
-created:id,
-updated:id,
-pinned:false
-}
-
+let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
 notes.unshift(note)
 save()
 openNote(id)
-
 }
 
-/* OPEN */
+/* OPEN NOTE */
 
 function openNote(id){
-
 current=id
 let note=notes.find(n=>n.id===id)
-
 title.value=note.title
 content.value=note.content
-
 renderMeta(note)
-
-if(mode==="preview")renderPreview()
-
+if(mode==="preview") renderPreview()
 renderPages()
-
 }
 
 /* META PANELS */
 
 function renderMeta(note){
-
-let tags=getTags(note.content)
-tagsDiv.innerText="Tags: "+tags.join(" ")
-
+tags.innerText="Tags: "+getTags(note.content).join(" ")
 let links=getLinks(note.content)
-
 let words=note.content.split(/\s+/).filter(Boolean).length
 let chars=note.content.length
-
 stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
-
 let refs=[]
-
-notes.forEach(n=>{
-if(n.id!==note.id && getLinks(n.content).includes(note.title)){
-refs.push(n.title)
-}
-})
-
+notes.forEach(n=>{if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n.title)})
 backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
-
 }
 
-/* TITLE */
+/* TITLE & CONTENT */
 
-title.oninput=e=>{
+title.oninput=e=>{let n=notes.find(x=>x.id===current);n.title=e.target.value;n.updated=Date.now();save();renderPages()}
+content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value;n.updated=Date.now();save();renderMeta(n);if(mode==="preview") renderPreview()}
 
-let n=notes.find(x=>x.id===current)
+/* PIN / DELETE */
 
-n.title=e.target.value
-n.updated=Date.now()
-
-save()
-renderPages()
-
-}
-
-/* CONTENT */
-
-content.oninput=e=>{
-
-let n=notes.find(x=>x.id===current)
-
-n.content=e.target.value
-n.updated=Date.now()
-
-save()
-
-renderMeta(n)
-
-if(mode==="preview")renderPreview()
-
-}
-
-/* PIN */
-
-function togglePin(){
-
-let n=notes.find(x=>x.id===current)
-n.pinned=!n.pinned
-save()
-renderPages()
-
-}
-
-/* DELETE */
-
-function deleteNote(){
-
-if(!confirm("Delete note?")) return
-
-notes=notes.filter(n=>n.id!==current)
-
-save()
-
-if(notes.length) openNote(notes[0].id)
-
-renderPages()
-
-}
+function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
+function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
 /* MARKDOWN */
 
 function renderPreview(){
-
 let html=marked.parse(content.value)
-
 html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-
 let note=notes.find(n=>n.title===name)
-
-if(!note){
-
-let id=Date.now()
-
-note={id,title:name,content:"",created:id,updated:id,pinned:false}
-
-notes.push(note)
-save()
-
-}
-
+if(!note){let id=Date.now();note={id,title:name,content:"",created:id,updated:id,pinned:false};notes.push(note);save()}
 return "<a href='#' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-
 })
-
 preview.innerHTML=html
-
 }
 
 /* MODE */
 
-function setMode(m){
-
-mode=m
-
-if(m==="edit"){
-
-content.style.display="block"
-preview.style.display="none"
-
-}else{
-
-renderPreview()
-
-content.style.display="none"
-preview.style.display="block"
-
-}
-
-}
+function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
 
 /* SEARCH */
 
-search.oninput=e=>{
-renderPages(e.target.value.toLowerCase())
-}
+search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 
-/* EXPORT */
+/* EXPORT / IMPORT */
 
-function exportNotes(){
-
-let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"})
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download="notes_export.json"
-a.click()
-
-}
-
-/* IMPORT */
-
-importFile.onchange=e=>{
-
-let f=e.target.files[0]
-
-let r=new FileReader()
-
-r.onload=function(evt){
-
-notes=JSON.parse(evt.target.result)
-
-save()
-
-openNote(notes[0].id)
-
-renderPages()
-
-}
-
-r.readAsText(f)
-
-}
+function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
+importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
 
 /* COMMAND PALETTE */
 
 document.addEventListener("keydown",e=>{
+if(e.ctrlKey && e.key==="/"){e.preventDefault();search.focus()}
+if(e.ctrlKey && e.key==="k"){e.preventDefault();palette.style.display="flex";paletteSearch.focus();renderPalette()}})
 
-if(e.ctrlKey && e.key==="/"){
-e.preventDefault()
-search.focus()
-}
-
-if(e.ctrlKey && e.key==="k"){
-e.preventDefault()
-palette.style.display="flex"
-paletteSearch.focus()
-renderPalette()
-}
-
-})
-
-function renderPalette(filter=""){
-
-paletteList.innerHTML=""
-
-notes.filter(n=>n.title.toLowerCase().includes(filter))
-.forEach(n=>{
-
-let d=document.createElement("div")
-d.className="paletteItem"
-d.textContent=n.title
-
-d.onclick=()=>{
-openNote(n.id)
-palette.style.display="none"
-}
-
-paletteList.appendChild(d)
-
-})
-
-}
-
-paletteSearch.oninput=e=>{
-renderPalette(e.target.value.toLowerCase())
-}
+function renderPalette(filter=""){paletteList.innerHTML="";notes.filter(n=>n.title.toLowerCase().includes(filter)).forEach(n=>{let d=document.createElement("div");d.className="paletteItem";d.textContent=n.title;d.onclick=()=>{openNote(n.id);palette.style.display="none"};paletteList.appendChild(d)})}
+paletteSearch.oninput=e=>{renderPalette(e.target.value.toLowerCase())}
 
 /* INIT */
 
-if(notes.length===0){
-
-let id=Date.now()
-
-notes.push({
-id:id,
-title:"Welcome",
-content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",
-created:id,
-updated:id,
-pinned:false
-})
-
-save()
-
-}
-
+if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
 openNote(notes[0].id)
 renderPages()
 
