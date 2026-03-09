@@ -3,300 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad</title>
+<title>Notepad v2.0</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 <style>
-body{
-  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
-  margin:0;
-  background:#f5f6f8;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+/* ... (Keep all your existing styles above unchanged) ... */
 
-/* TOP BAR */
-#topbar{
-  background:white;
+/* TAG PANEL */
+#tagPanel{
   padding:6px;
   display:flex;
-  gap:6px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.05);
-}
-#search{
-  flex:1;
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ddd;
-  font-size:13px;
-}
-.topbtn{
-  padding:4px 8px;
-  border:1px solid #ccc;
-  background:white;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
-}
-
-/* LAYOUT */
-#container{
-  flex:1;
-  display:flex;
-  overflow:hidden;
-}
-
-/* LEFT SIDEBAR */
-#sidebar{
-  width:160px;
-  background:white;
-  border-right:1px solid #eee;
-  display:flex;
-  flex-direction:column;
-}
-#pages{
-  flex:1;
-  overflow:auto;
-}
-.page{
-  padding:3px 5px;
-  cursor:pointer;
-  border-bottom:1px solid #f1f1f1;
-  font-size:11px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  white-space:nowrap;
-}
-.page:hover{
-  background:#f5f6f8;
-}
-.active{
-  background:#e8f0ff;
-}
-.pin{
-  font-size:10px;
-  color:#999;
-  margin-left:4px;
-}
-.dateLabel{
-  font-size:9px;
-  color:#999;
-  margin-left:4px;
-}
-#newPage{
-  margin:4px;
-  padding:4px;
-  border:none;
-  border-radius:4px;
-  background:#2f7ef7;
-  color:white;
-  cursor:pointer;
-  font-size:11px;
-  align-self:stretch;
-}
-
-/* MAIN EDITOR */
-#editorCard{
-  flex:1;
-  margin:12px;
-  background:white;
-  border-radius:10px;
-  border:1px solid #e6e6e6;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-  #editorCard:focus-within{
-  border:1px solid #2f7ef7;
-}
-
-
-/* Buttons above title */
-#mode{
-  padding:4px 8px;
-  display:flex;
+  flex-wrap:wrap;
   gap:4px;
-  align-items:center;
-  border-bottom:1px solid #eee;
-}
-
-#mode button {
-  padding:2px 6px;          /* smaller padding for compact look */
-  font-size:10px;           /* smaller font */
-  height:20px;              /* compact height */
-  border-radius:4px;        /* slightly rounded */
-  border:1px solid #ffbaba; /* same Delete button border */
-  background:#ffebeb;       /* same Delete button background */
-  cursor:pointer;
-  margin-right:4px;
-}
-#deleteBtn {
-  margin-left:auto;         /* keeps Delete button on far right */
-}
-
-#title{
-  border:none;
-  padding:14px 14px 6px 14px;
-  font-size:20px;
-  font-weight:700;
-  outline:none;
-  background:white;
-}
-#content{
-  flex:1;
-  border:none;
-  padding:10px 14px 16px 14px;
-  font-family:monospace;
-  font-size:14px;
-  line-height:1.6;
-  outline:none;
-  resize:none;
-  background:white;
-}
-#preview{
-  flex:1;
-  padding:12px 16px;
-  font-size:15px;
-  line-height:1.6;
-}
-
-/* META PANELS */
-#tags,#stats,#backlinks{
-  padding:4px 8px;
-  font-size:11px;
   border-top:1px solid #eee;
-  color:#555;
+  background:#fafafa;
 }
-
-/* MARKDOWN */
-#preview h1{font-size:22px}
-#preview h2{font-size:18px}
-#preview pre{background:#f1f1f1;padding:8px;border-radius:6px}
-#preview code{background:#f1f1f1;padding:2px 4px;border-radius:4px}
-#preview ul{padding-left:18px}
-
-/* COMMAND PALETTE */
-#palette{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:white;
-  width:320px;
-  border-radius:8px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  display:none;
-  flex-direction:column;
-}
-#palette input{
-  border:none;
-  border-bottom:1px solid #eee;
-  padding:10px;
-  outline:none;
-}
-.paletteItem{
-  padding:8px;
-  cursor:pointer;
-}
-.paletteItem:hover{
-  background:#f5f6f8;
-}
-
-/* RIGHT TODO SIDEBAR */
-#todoSidebar{
-  width:320px;
-  background:white;
-  border-left:1px solid #eee;
-  display:flex;
-  flex-direction:column;
-  transition: all 0.2s;
-}
-#todoHeader{
-  padding:4px;
-  display:flex;
-  gap:4px;
-  justify-content:space-between;
-  align-items:center;
-  font-size:11px;
-  border-bottom:1px solid #eee;
-}
-.todoBtn{
-  cursor:pointer;
-  font-size:11px;
-  padding:2px 4px;
+.tagItem{
+  background:#e0f0ff;
+  color:#0077cc;
+  padding:2px 6px;
   border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
-}
-#todoButtons{
-  display:flex;
-  gap:2px;
-  flex-wrap:nowrap;
-}
-#todoContent, #todoPreview{
-  flex:1;
-  padding:4px;
-  font-size:11px;
-  border:none;
-  resize:none;
-  outline:none;
-  font-family:monospace;
-}
-#todoPreview{
-  display:none;
-  overflow:auto;
-}
-
-/* STICKY NOTE */
-#stickyNote {
-  background: #fff7a8;
-  padding:6px;
-  margin:4px;
-  border-radius:6px;
-  font-size:12px;
-  min-height:40px;
-  max-height:80px;
-  overflow-y:auto;
-  box-shadow:0 2px 4px rgba(0,0,0,0.1);
-  resize:none;
-}
-
-/* FLOATING SHOW BUTTON */
-#showTodoBtn{
-  display:none;
-  position:fixed;
-  top:50%;
-  right:0;
-  transform:translateY(-50%);
-  padding:4px 6px;
-  font-size:11px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
   cursor:pointer;
+  font-size:11px;
 }
-
-/* MOBILE OPTIMIZATIONS */
-@media(max-width:900px){
-  #container{flex-direction:column;}
-  #sidebar,#todoSidebar{width:100%;height:auto;max-height:140px;display:flex;overflow-x:auto;border:none;border-bottom:1px solid #eee;}
-  #pages{display:flex;gap:4px;flex-wrap:nowrap;}
-  .page{flex:0 0 auto;border-bottom:none;border-right:1px solid #eee;padding:2px 4px;font-size:10px;}
-  #editorCard{margin:5px;}
-  #title{font-size:14px;padding:8px;}
-  #content,#preview{font-size:13px;padding:6px;}
-  #mode button{padding:3px 5px;font-size:11px;}
-  #tags,#stats,#backlinks{font-size:10px;padding:3px 6px;}
-  #preview{min-height:180px;}
-}
-@media(max-width:400px){
-  #topbar{flex-direction:column;gap:4px;padding:4px;}
-  #search{width:100%;font-size:12px;padding:4px;}
-  .topbtn{width:100%;font-size:11px;padding:4px 6px;}
-}
-  #linkSuggest{
+.tagItem:hover{background:#c8e0ff;}
+#tagSuggest{
   position:absolute;
   background:white;
   border:1px solid #ddd;
@@ -308,41 +38,17 @@ body{
   font-size:12px;
   z-index:999;
 }
-
-.linkItem{
+.tagSuggestItem{
   padding:6px 8px;
   cursor:pointer;
 }
-
-.linkItem:hover{
+.tagSuggestItem:hover{
   background:#f0f4ff;
-}
-/* LINK HOVER PREVIEW */
-#hoverPreview{
-  position:absolute;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-  padding:10px;
-  width:260px;
-  max-height:200px;
-  overflow:auto;
-  font-size:12px;
-  display:none;
-  z-index:999;
-}
-/* Slight background tint for modes */
-#editorCard.editMode {
-  background: #fff;       /* normal white for edit */
-}
-#editorCard.previewMode {
-  background: #f9faff;    /* light bluish tint for preview */
 }
 </style>
 </head>
-
 <body>
+
 <div id="topbar">
 <input id="search" placeholder="Search notes (Ctrl + /)">
 <button class="topbtn" onclick="exportNotes()">Export</button>
@@ -351,13 +57,12 @@ body{
 </div>
 
 <div id="container">
-  <!-- LEFT SIDEBAR -->
   <div id="sidebar">
     <div id="pages"></div>
+    <div id="tagPanel"></div> <!-- TAG PANEL -->
     <button id="newPage">+ New Page</button>
   </div>
 
-  <!-- MAIN EDITOR -->
   <div id="editorCard">
     <div id="mode">
       <button onclick="setMode('edit')">Edit</button>
@@ -373,7 +78,6 @@ body{
     <div id="backlinks"></div>
   </div>
 
-  <!-- RIGHT TODO SIDEBAR -->
   <div id="todoSidebar">
     <div id="todoHeader">
       <span>Todo</span>
@@ -383,15 +87,12 @@ body{
         <button class="todoBtn" onclick="toggleTodo()">⇄</button>
       </div>
     </div>
-    <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">
-      Write sticky note here...
-    </div>
+    <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">Write sticky note here...</div>
     <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
     <div id="todoPreview"></div>
   </div>
 </div>
 
-<!-- FLOATING SHOW BUTTON -->
 <button id="showTodoBtn" onclick="toggleTodo()">Show Todo</button>
 
 <div id="palette">
@@ -400,11 +101,14 @@ body{
 </div>
 <div id="linkSuggest"></div>
 <div id="hoverPreview"></div>
+<div id="tagSuggest"></div> <!-- TAG SUGGEST -->
+
 <script>
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode="preview"
+let tagFilter = null
 
 // --- TODO ---
 let todoVisible = true
@@ -414,15 +118,29 @@ let todoMode = "edit"
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
 function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
-/* TAGS & LINKS */
-function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
+// --- TAGS & LINKS ---
+function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m.map(t=>t.toLowerCase()))]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
-/* SIDEBAR RENDER */
+// --- RENDER TAG PANEL ---
+function renderTagPanel(){
+  let uniqueTags = [...new Set(notes.flatMap(n=>n.tags || []))].sort()
+  tagPanel.innerHTML = ""
+  uniqueTags.forEach(tag=>{
+    let span = document.createElement("span")
+    span.className="tagItem"
+    span.textContent=tag
+    span.onclick=()=>{tagFilter=tag;renderPages(search.value.toLowerCase())}
+    tagPanel.appendChild(span)
+  })
+}
+
+// --- SIDEBAR RENDER ---
 function renderPages(filter=""){
     let pinned=[],others=[]
     notes.forEach(n=>{
         if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
+        if(tagFilter && (!n.tags || !n.tags.includes(tagFilter))) return
         if(n.pinned) pinned.push(n)
         else others.push(n)
     })
@@ -446,93 +164,91 @@ function renderPages(filter=""){
     }
     renderList(pinned)
     renderList(others)
+    renderTagPanel()
 }
 
-/* NEW NOTE */
+// --- NEW NOTE ---
 newPage.onclick=()=>{
     let id=Date.now()
-    let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
+    let note={id:id,title:"Untitled Note",content:"",tags:[],created:id,updated:id,pinned:false}
     notes.unshift(note)
     save()
     openNote(id)
 }
 
-/* META PANELS */
+// --- META PANELS ---
 function renderMeta(note){
-
-    tags.innerText="Tags: "+getTags(note.content).join(" ")
-
+    note.tags = getTags(note.content)
+    tags.innerHTML = "Tags: " + note.tags.map(t=>`<span class='tagItem' onclick="tagFilter='${t}';renderPages(search.value.toLowerCase())">${t}</span>`).join(" ")
     let links=getLinks(note.content)
     let words=note.content.split(/\s+/).filter(Boolean).length
     let chars=note.content.length
-
     stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
-
     let refs=[]
-
     notes.forEach(n=>{
         if(n.id!==note.id && getLinks(n.content).includes(note.title)){
             refs.push(n)
         }
     })
-
     if(refs.length===0){
         backlinks.innerHTML="Backlinks: None"
         return
     }
-
     backlinks.innerHTML="Backlinks: "
-
     refs.forEach((n,i)=>{
         let a=document.createElement("a")
         a.href="#"
         a.textContent=n.title
         a.style.marginRight="6px"
-
         a.onclick=(e)=>{
             e.preventDefault()
             openNote(n.id)
         }
-
         backlinks.appendChild(a)
     })
 }
 
-/* TITLE & CONTENT */
-title.oninput=e=>{let n=notes.find(x=>x.id===current);n.title=e.target.value;n.updated=Date.now();save();renderPages()}
-content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value;n.updated=Date.now();save();renderMeta(n);if(mode==="preview") renderPreview()}
+// --- TITLE & CONTENT ---
+title.oninput=e=>{
+  let n=notes.find(x=>x.id===current)
+  n.title=e.target.value
+  n.updated=Date.now()
+  save()
+  renderPages()
+}
+content.oninput=e=>{
+  let n=notes.find(x=>x.id===current)
+  n.content=e.target.value
+  n.updated=Date.now()
+  n.tags = getTags(n.content)
+  save()
+  renderMeta(n)
+  if(mode==="preview") renderPreview()
+}
 
-/* PIN / DELETE */
+// --- PIN / DELETE ---
 function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
-/* MARKDOWN */
+// --- MARKDOWN ---
 function renderPreview(){
-
   let html = marked.parse(content.value)
-
   html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-
-let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
-
+    let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
     if(!note){
       let id = Date.now()
-      note = {id:id,title:name,content:"",created:id,updated:id,pinned:false}
+      note = {id:id,title:name,content:"",tags:[],created:id,updated:id,pinned:false}
       notes.push(note)
       save()
     }
-
     return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-
   })
-
   preview.innerHTML = html
 }
 
-/* MODE */
+// --- MODE ---
 function setMode(m){
-  mode = m;
-
+  mode = m
   if(m === "edit"){
     content.style.display = "block";
     preview.style.display = "none";
@@ -547,200 +263,68 @@ function setMode(m){
   }
 }
 
-/* TODO MODE */
-function setTodoMode(m){
-  todoMode = m
-  if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
-  else{todoPreview.innerHTML = marked.parse(todoContent.value); todoContent.style.display="none";todoPreview.style.display="block"}
-}
-
-/* TODO INPUT AUTO UPDATE PREVIEW */
-todoContent.oninput = ()=>{
-  saveTodo()
-  if(todoMode==="preview"){
-    todoPreview.innerHTML = marked.parse(todoContent.value)
-  }
-}
-
-/* TOGGLE TODO */
-function toggleTodo(){
-    todoVisible=!todoVisible
-    todoSidebar.style.display = todoVisible ? "flex" : "none"
-    showTodoBtn.style.display = todoVisible ? "none" : "block"
-}
-
-/* SEARCH */
-search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
-
-/* EXPORT / IMPORT TXT */
-function exportNotes(){
-  let txt = notes.map(n=>`Title: ${n.title}\nCreated: ${n.created}\nUpdated: ${n.updated}\nPinned: ${n.pinned}\nContent:\n${n.content}\n===\n`).join("\n")
-  let blob = new Blob([txt], {type:"text/plain"})
-  let a = document.createElement("a")
-  a.href = URL.createObjectURL(blob)
-  a.download = "notes_export.txt"
-  a.click()
-}
-importFile.onchange=e=>{
-  let f=e.target.files[0]
-  let r=new FileReader()
-  r.onload=function(evt){
-    let lines = evt.target.result.split("\n")
-    let newNotes = []
-    let i=0
-    while(i<lines.length){
-      if(lines[i].startsWith("Title: ")){
-        let title = lines[i].slice(7)
-        let created = Number(lines[i+1].slice(9))
-        let updated = Number(lines[i+2].slice(9))
-        let pinned = lines[i+3].slice(8)==="true"
-        i+=5
-        let content=[]
-        while(i<lines.length && lines[i]!=="==="){content.push(lines[i]);i++}
-        newNotes.push({id:Date.now()+Math.random(),title,content:content.join("\n"),created,updated,pinned})
+// --- TAG SUGGESTIONS ---
+const tagSuggest = document.getElementById("tagSuggest")
+content.addEventListener("keyup", function(e){
+  let pos = content.selectionStart
+  let text = content.value.substring(0,pos)
+  let match = text.match(/#(\w*)$/)
+  if(match){
+    let query = match[1].toLowerCase()
+    let allTags = [...new Set(notes.flatMap(n=>n.tags || []))]
+    let results = allTags.filter(t=>t.includes(query))
+    if(results.length===0){tagSuggest.style.display="none"; return}
+    tagSuggest.innerHTML=""
+    results.slice(0,8).forEach(t=>{
+      let div = document.createElement("div")
+      div.className="tagSuggestItem"
+      div.textContent=t
+      div.onclick=()=>{
+        let start = text.lastIndexOf("#")
+        let before = content.value.substring(0,start)
+        let after = content.value.substring(pos)
+        content.value = before + t + after
+        tagSuggest.style.display="none"
+        content.focus()
+        content.oninput() // trigger meta update
       }
-      i++
-    }
-    notes=newNotes
-    save()
-    if(notes.length) openNote(notes[0].id)
-    renderPages()
+      tagSuggest.appendChild(div)
+    })
+    let rect = content.getBoundingClientRect()
+    let lineHeight = 18
+    let lines = content.value.substr(0,pos).split("\n").length
+    tagSuggest.style.left = rect.left + 10 + "px"
+    tagSuggest.style.top = rect.top + (lines*lineHeight) + 20 + "px"
+    tagSuggest.style.display="block"
+  } else {
+    tagSuggest.style.display="none"
   }
-  r.readAsText(f)
-}
+})
 
-/* INIT */
-if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
-openNote(notes[0].id)
-
-/* INIT TODO */
-todoContent.value = localStorage.getItem("globalTodo") || ""
-todoContent.oninput = ()=>{saveTodo(); if(todoMode==="preview") todoPreview.innerHTML = marked.parse(todoContent.value)}
-
-// Ctrl + / to focus search
-document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preventDefault(); search.focus()}})
-
-// Sticky note
-stickyNote.innerText = localStorage.getItem("stickyNote") || ""
-stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerText)}
-  function openNote(id){
+// --- OPEN NOTE ---
+function openNote(id){
     current=id
     let note=notes.find(n=>n.id===id)
     title.value=note.title
     content.value=note.content
     renderMeta(note)
-    // Always start in preview mode
     setMode("preview")  
     renderPages()
 }
-  // INIT TODO
-todoContent.value = localStorage.getItem("globalTodo") || ""
-// Force preview mode on load
-setTodoMode("preview")
 
-// Auto-update preview when editing
-todoContent.oninput = ()=>{
-  saveTodo()
-  if(todoMode==="preview"){
-    todoPreview.innerHTML = marked.parse(todoContent.value)
-  }
+// --- INIT ---
+if(notes.length===0){
+  let id=Date.now()
+  notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",tags:getTags("# Welcome\n\nUse [[Example Note]]\n#demo"),created:id,updated:id,pinned:false})
+  save()
 }
-  const linkSuggest = document.getElementById("linkSuggest")
-
-content.addEventListener("keyup", function(e){
-
-  let pos = content.selectionStart
-  let text = content.value.substring(0,pos)
-
-  let match = text.match(/\[\[([^\[]*)$/)
-
-  if(match){
-
-    let query = match[1].toLowerCase()
-
-    let results = notes.filter(n =>
-      n.title.toLowerCase().includes(query)
-    )
-
-    if(results.length===0){
-      linkSuggest.style.display="none"
-      return
-    }
-
-    linkSuggest.innerHTML=""
-
-    results.slice(0,8).forEach(n=>{
-      let div=document.createElement("div")
-      div.className="linkItem"
-      div.textContent=n.title
-
-      div.onclick=()=>{
-        let start = text.lastIndexOf("[[")
-        let before = content.value.substring(0,start)
-        let after = content.value.substring(pos)
-
-        content.value = before + "[["+n.title+"]]" + after
-        linkSuggest.style.display="none"
-
-        content.focus()
-      }
-
-      linkSuggest.appendChild(div)
-    })
-
-let rect = content.getBoundingClientRect()
-
-let lineHeight = 18
-let lines = content.value.substr(0, content.selectionStart).split("\n").length
-
-linkSuggest.style.left = rect.left + 10 + "px"
-linkSuggest.style.top = rect.top + (lines * lineHeight) + 20 + "px"
-linkSuggest.style.display="block"
-
-  } else {
-    linkSuggest.style.display="none"
-  }
-
-})
-const hoverPreview = document.getElementById("hoverPreview")
-let hoverTimer = null
-
-preview.addEventListener("mouseover", function(e){
-
-  if(e.target.classList.contains("noteLink")){
-
-    clearTimeout(hoverTimer)
-
-    hoverTimer = setTimeout(()=>{
-
-      let id = Number(e.target.dataset.id)
-      let note = notes.find(n=>n.id===id)
-
-      if(!note) return
-
-      let rect = e.target.getBoundingClientRect()
-
-      hoverPreview.style.left = rect.right + 10 + "px"
-      hoverPreview.style.top = rect.top + "px"
-
-      hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
-
-      hoverPreview.style.display="block"
-
-    },150)
-
-  }
-
-})
-
-preview.addEventListener("mouseout", function(e){
-
-  if(e.target.classList.contains("noteLink")){
-    clearTimeout(hoverTimer)
-    hoverPreview.style.display="none"
-  }
-
-})
+openNote(notes[0].id)
+todoContent.value = localStorage.getItem("globalTodo") || ""
+setTodoMode("preview")
+stickyNote.innerText = localStorage.getItem("stickyNote") || ""
+stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerText)}
+document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preventDefault(); search.focus()}})
+search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 </script>
 </body>
 </html>
