@@ -277,6 +277,22 @@ body{
   #search{width:100%;font-size:12px;padding:4px;}
   .topbtn{width:100%;font-size:11px;padding:4px 6px;}
 }
+  #stickyNote {
+  background: #fff7a8; /* soft yellow sticky note */
+  padding: 6px;
+  margin: 4px;
+  border-radius: 6px;
+  font-size: 12px;
+  min-height: 40px;
+  max-height: 80px;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  resize: none;
+}
+#todoSidebar {
+  display: flex;
+  flex-direction: column;
+}
 </style>
 </head>
 
@@ -322,6 +338,9 @@ body{
         <button class="todoBtn" onclick="toggleTodo()">⇄</button>
       </div>
     </div>
+    <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">
+  Write sticky note here...
+</div>
     <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
     <div id="todoPreview"></div>
   </div>
@@ -484,6 +503,11 @@ document.addEventListener("keydown", e => {
     search.focus();
   }
 });
+  // Load sticky note from localStorage
+stickyNote.innerText = localStorage.getItem("stickyNote") || "";
+stickyNote.oninput = () => {
+  localStorage.setItem("stickyNote", stickyNote.innerText);
+};
 </script>
 </body>
 </html>
