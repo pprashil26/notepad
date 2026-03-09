@@ -529,6 +529,16 @@ document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preven
 // Sticky note
 stickyNote.innerText = localStorage.getItem("stickyNote") || ""
 stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerText)}
+  function openNote(id){
+    current=id
+    let note=notes.find(n=>n.id===id)
+    title.value=note.title
+    content.value=note.content
+    renderMeta(note)
+    // Always start in preview mode
+    setMode("preview")  
+    renderPages()
+}
 </script>
 </body>
 </html>
