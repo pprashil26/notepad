@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad with Todo Sidebar</title>
+<title>Markdown Knowledge Notepad with Markdown Todo Sidebar</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -219,7 +219,7 @@ body{
   border:1px solid #ccc;
   background:#f5f5f5;
 }
-#todoContent{
+#todoContent, #todoPreview{
   flex:1;
   padding:4px;
   font-size:11px;
@@ -227,6 +227,25 @@ body{
   resize:none;
   outline:none;
   font-family:monospace;
+}
+#todoPreview{
+  display:none;
+  overflow:auto;
+}
+
+/* FLOATING SHOW BUTTON */
+#showTodoBtn{
+  display:none;
+  position:fixed;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+  padding:4px 6px;
+  font-size:11px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  background:#f5f5f5;
+  cursor:pointer;
 }
 
 /* MOBILE OPTIMIZATIONS */
@@ -259,53 +278,45 @@ body{
 </div>
 
 <div id="container">
-<!-- LEFT SIDEBAR -->
-<div id="sidebar">
-<button id="newPage">+ New Page</button>
-<div id="pages"></div>
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar">
+    <button id="newPage">+ New Page</button>
+    <div id="pages"></div>
+  </div>
+
+  <!-- MAIN EDITOR -->
+  <div id="editorCard">
+    <input id="title" placeholder="Title">
+    <div id="mode">
+      <button onclick="setMode('edit')">Edit</button>
+      <button onclick="setMode('preview')">Preview</button>
+      <button onclick="togglePin()">Pin</button>
+      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+    </div>
+    <textarea id="content"></textarea>
+    <div id="preview"></div>
+    <div id="tags"></div>
+    <div id="stats"></div>
+    <div id="backlinks"></div>
+  </div>
+
+  <!-- RIGHT MARKDOWN TODO SIDEBAR -->
+  <div id="todoSidebar">
+    <div id="todoHeader">
+      <span>Todo List</span>
+      <span id="todoToggle" onclick="toggleTodo()">⇄</span>
+      <span>
+        <button onclick="setTodoMode('edit')">Edit</button>
+        <button onclick="setTodoMode('preview')">Preview</button>
+      </span>
+    </div>
+    <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
+    <div id="todoPreview"></div>
+  </div>
 </div>
 
-<!-- MAIN EDITOR -->
-<div id="editorCard">
-<input id="title" placeholder="Title">
-<div id="mode">
-<button onclick="setMode('edit')">Edit</button>
-<button onclick="setMode('preview')">Preview</button>
-<button onclick="togglePin()">Pin</button>
-<button id="deleteBtn" onclick="deleteNote()">Delete</button>
-</div>
-<textarea id="content"></textarea>
-<div id="preview"></div>
-<div id="tags"></div>
-<div id="stats"></div>
-<div id="backlinks"></div>
-</div>
-
-<!-- Floating button to show Todo sidebar -->
-<button id="showTodoBtn" onclick="toggleTodo()" 
-        style="display:none;
-               position:fixed;
-               top:50%;
-               right:0;
-               transform:translateY(-50%);
-               padding:4px 6px;
-               font-size:11px;
-               border-radius:4px;
-               border:1px solid #ccc;
-               background:#f5f5f5;
-               cursor:pointer;">
-  Show Todo
-</button>
-
-<!-- RIGHT TODO SIDEBAR -->
-<div id="todoSidebar">
-<div id="todoHeader">
-  <span>Todo List</span>
-  <span id="todoToggle" onclick="toggleTodo()">⇄</span>
-</div>
-<textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
-</div>
-</div>
+<!-- FLOATING SHOW BUTTON -->
+<button id="showTodoBtn" onclick="toggleTodo()">Show Todo</button>
 
 <div id="palette">
 <input id="paletteSearch" placeholder="Jump to note...">
@@ -317,8 +328,11 @@ let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode="edit"
 let todoVisible = true
+let todoMode = "edit"
 
+// SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
+// SAVE TODO
 function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
 /* TAGS & LINKS */
@@ -409,6 +423,13 @@ function renderPreview(){
 /* MODE */
 function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
 
+/* TODO MODE */
+function setTodoMode(m){
+  todoMode = m
+  if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
+  else{todoPreview.innerHTML=marked.parse(todoContent.value);todoContent.style.display="none";todoPreview.style.display="block"}
+}
+
 /* SEARCH */
 search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 
@@ -433,13 +454,8 @@ todoContent.oninput = saveTodo
 function toggleTodo(){
     todoVisible=!todoVisible
     todoSidebar.style.display = todoVisible ? "flex" : "none"
+    showTodoBtn.style.display = todoVisible ? "none" : "block"
 }
-function toggleTodo(){
-    todoVisible = !todoVisible;
-    todoSidebar.style.display = todoVisible ? "flex" : "none";
-    showTodoBtn.style.display = todoVisible ? "none" : "block";
-}
-  
 </script>
 
 </body>
