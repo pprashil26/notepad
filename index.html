@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Markdown Knowledge Notepad with Bottom New Page</title>
-
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
@@ -102,29 +101,19 @@ body{
 #editorCard {
   flex:1;
   margin:10px;
-  background:#dffcf0; /* main editor background */
+  background:#dffcf0;
   border-radius:10px;
   box-shadow:0 3px 10px rgba(0,0,0,0.06);
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background-image: radial-gradient(#c6f0d6 1px, transparent 1px); /* dot grid */
-  background-size: 20px 20px; /* spacing of dots */
+  background-image: radial-gradient(#c6f0d6 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-#title {
-  border:none;
-  padding:10px;
-  font-size:15px;
-  font-weight:600;
-  outline:none;
-  background:#dffcf0; /* same as editor */
-  background-image: radial-gradient(#c6f0d6 1px, transparent 1px); /* dots */
-  background-size: 20px 20px; /* same spacing as main editor */
-}
+/* Buttons above title */
 #mode{
   padding:6px 10px;
-  border-bottom:1px solid #eee;
   display:flex;
   gap:4px;
   font-size:12px;
@@ -140,6 +129,17 @@ body{
   margin-left:auto;
   background:#ffebeb;
   border:1px solid #ffbaba;
+}
+
+#title {
+  border:none;
+  padding:10px;
+  font-size:15px;
+  font-weight:600;
+  outline:none;
+  background:#dffcf0;
+  background-image: radial-gradient(#c6f0d6 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 #content{
   flex:1;
@@ -244,6 +244,20 @@ body{
   overflow:auto;
 }
 
+/* STICKY NOTE */
+#stickyNote {
+  background: #fff7a8;
+  padding:6px;
+  margin:4px;
+  border-radius:6px;
+  font-size:12px;
+  min-height:40px;
+  max-height:80px;
+  overflow-y:auto;
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  resize:none;
+}
+
 /* FLOATING SHOW BUTTON */
 #showTodoBtn{
   display:none;
@@ -277,22 +291,6 @@ body{
   #search{width:100%;font-size:12px;padding:4px;}
   .topbtn{width:100%;font-size:11px;padding:4px 6px;}
 }
-  #stickyNote {
-  background: #fff7a8; /* soft yellow sticky note */
-  padding: 6px;
-  margin: 4px;
-  border-radius: 6px;
-  font-size: 12px;
-  min-height: 40px;
-  max-height: 80px;
-  overflow-y: auto;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  resize: none;
-}
-#todoSidebar {
-  display: flex;
-  flex-direction: column;
-}
 </style>
 </head>
 
@@ -312,21 +310,20 @@ body{
   </div>
 
   <!-- MAIN EDITOR -->
-<!-- MAIN EDITOR -->
-<div id="editorCard">
-  <div id="mode">
-    <button onclick="setMode('edit')">Edit</button>
-    <button onclick="setMode('preview')">Preview</button>
-    <button onclick="togglePin()">Pin</button>
-    <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+  <div id="editorCard">
+    <div id="mode">
+      <button onclick="setMode('edit')">Edit</button>
+      <button onclick="setMode('preview')">Preview</button>
+      <button onclick="togglePin()">Pin</button>
+      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+    </div>
+    <input id="title" placeholder="Title">
+    <textarea id="content"></textarea>
+    <div id="preview"></div>
+    <div id="tags"></div>
+    <div id="stats"></div>
+    <div id="backlinks"></div>
   </div>
-  <input id="title" placeholder="Title">
-  <textarea id="content"></textarea>
-  <div id="preview"></div>
-  <div id="tags"></div>
-  <div id="stats"></div>
-  <div id="backlinks"></div>
-</div>
 
   <!-- RIGHT TODO SIDEBAR -->
   <div id="todoSidebar">
@@ -339,8 +336,8 @@ body{
       </div>
     </div>
     <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">
-  Write sticky note here...
-</div>
+      Write sticky note here...
+    </div>
     <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
     <div id="todoPreview"></div>
   </div>
@@ -366,7 +363,6 @@ let todoMode = "edit"
 
 // SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
-// SAVE TODO
 function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
 /* TAGS & LINKS */
@@ -442,7 +438,7 @@ content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value
 /* PIN / DELETE */
 function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
-setMode("preview")
+
 /* MARKDOWN */
 function renderPreview(){
     let html=marked.parse(content.value)
@@ -482,9 +478,42 @@ function toggleTodo(){
 /* SEARCH */
 search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 
-/* EXPORT / IMPORT */
-function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
-importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
+/* EXPORT / IMPORT TXT */
+function exportNotes(){
+  let txt = notes.map(n=>`Title: ${n.title}\nCreated: ${n.created}\nUpdated: ${n.updated}\nPinned: ${n.pinned}\nContent:\n${n.content}\n===\n`).join("\n")
+  let blob = new Blob([txt], {type:"text/plain"})
+  let a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = "notes_export.txt"
+  a.click()
+}
+importFile.onchange=e=>{
+  let f=e.target.files[0]
+  let r=new FileReader()
+  r.onload=function(evt){
+    let lines = evt.target.result.split("\n")
+    let newNotes = []
+    let i=0
+    while(i<lines.length){
+      if(lines[i].startsWith("Title: ")){
+        let title = lines[i].slice(7)
+        let created = Number(lines[i+1].slice(9))
+        let updated = Number(lines[i+2].slice(9))
+        let pinned = lines[i+3].slice(8)==="true"
+        i+=5
+        let content=[]
+        while(i<lines.length && lines[i]!=="==="){content.push(lines[i]);i++}
+        newNotes.push({id:Date.now()+Math.random(),title,content:content.join("\n"),created,updated,pinned})
+      }
+      i++
+    }
+    notes=newNotes
+    save()
+    if(notes.length) openNote(notes[0].id)
+    renderPages()
+  }
+  r.readAsText(f)
+}
 
 /* INIT */
 if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
@@ -492,22 +521,14 @@ openNote(notes[0].id)
 
 /* INIT TODO */
 todoContent.value = localStorage.getItem("globalTodo") || ""
-todoContent.oninput = ()=>{
-  saveTodo()
-  if(todoMode==="preview") todoPreview.innerHTML = marked.parse(todoContent.value)
-}
-  // Ctrl + / to focus search
-document.addEventListener("keydown", e => {
-  if (e.ctrlKey && e.key === "/") {
-    e.preventDefault();
-    search.focus();
-  }
-});
-  // Load sticky note from localStorage
-stickyNote.innerText = localStorage.getItem("stickyNote") || "";
-stickyNote.oninput = () => {
-  localStorage.setItem("stickyNote", stickyNote.innerText);
-};
+todoContent.oninput = ()=>{saveTodo(); if(todoMode==="preview") todoPreview.innerHTML = marked.parse(todoContent.value)}
+
+// Ctrl + / to focus search
+document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preventDefault(); search.focus()}})
+
+// Sticky note
+stickyNote.innerText = localStorage.getItem("stickyNote") || ""
+stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerText)}
 </script>
 </body>
 </html>
