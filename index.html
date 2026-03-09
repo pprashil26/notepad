@@ -1,463 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad with Markdown Todo</title>
+<title>Markdown Notes</title>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 
 <style>
+
 body{
-  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
-  margin:0;
-  background:#f5f6f8;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+margin:0;
+font-family:sans-serif;
 }
 
-/* TOP BAR */
-#topbar{
-  background:white;
-  padding:6px;
-  display:flex;
-  gap:6px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.05);
-}
-#search{
-  flex:1;
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ddd;
-  font-size:13px;
-}
-.topbtn{
-  padding:4px 8px;
-  border:1px solid #ccc;
-  background:white;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
-}
-
-/* LAYOUT */
-#container{
-  flex:1;
-  display:flex;
-  overflow:hidden;
+.app{
+display:flex;
+height:100vh;
 }
 
 /* LEFT SIDEBAR */
-#sidebar{
-  width:160px;
-  background:white;
-  border-right:1px solid #eee;
-  display:flex;
-  flex-direction:column;
+
+.left-sidebar{
+width:160px;
+display:flex;
+flex-direction:column;
+border-right:1px solid #ddd;
+font-size:13px;
 }
-#pages{
-  flex:1;
-  overflow:auto;
+
+.pages-list{
+flex:1;
+overflow-y:auto;
 }
-.page{
-  padding:3px 5px;
-  cursor:pointer;
-  border-bottom:1px solid #f1f1f1;
-  font-size:11px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  white-space:nowrap;
+
+.page-item{
+padding:6px 8px;
+cursor:pointer;
 }
-.page:hover{
-  background:#f5f6f8;
+
+.page-item:hover{
+background:#f2f2f2;
 }
-.active{
-  background:#e8f0ff;
+
+.sidebar-buttons{
+display:flex;
+flex-direction:column;
+gap:4px;
+padding:6px;
 }
-.pin{
-  font-size:10px;
-  color:#999;
-  margin-left:4px;
+
+.sidebar-buttons button{
+font-size:12px;
+padding:6px;
+border:1px solid #ccc;
+background:white;
+cursor:pointer;
 }
-.dateLabel{
-  font-size:9px;
-  color:#999;
-  margin-left:4px;
-}
-#newPage{
-  margin:4px;
-  padding:4px;
-  border:none;
-  border-radius:4px;
-  background:#2f7ef7;
-  color:white;
-  cursor:pointer;
-  font-size:11px;
-  align-self:stretch;
+
+.sidebar-buttons button:hover{
+background:#f5f5f5;
 }
 
 /* MAIN EDITOR */
-#editorCard{
-  flex:1;
-  margin:10px;
-  background:white;
-  border-radius:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.06);
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-#title{
-  border:none;
-  border-bottom:1px solid #eee;
-  padding:10px;
-  font-size:15px;
-  font-weight:600;
-  outline:none;
-}
-#mode{
-  padding:6px 10px;
-  border-bottom:1px solid #eee;
-  display:flex;
-  gap:4px;
-  font-size:12px;
-}
-#mode button{
-  padding:3px 6px;
-  border:1px solid #ccc;
-  background:white;
-  border-radius:4px;
-  cursor:pointer;
-}
-#deleteBtn{
-  margin-left:auto;
-  background:#ffebeb;
-  border:1px solid #ffbaba;
-}
-#content{
-  flex:1;
-  border:none;
-  padding:10px;
-  font-family:monospace;
-  font-size:13px;
-  outline:none;
-  resize:none;
-}
-#preview{
-  flex:1;
-  padding:10px;
-  overflow:auto;
-  display:none;
+
+.main-editor{
+flex:1;
 }
 
-/* META PANELS */
-#tags,#stats,#backlinks{
-  padding:4px 8px;
-  font-size:11px;
-  border-top:1px solid #eee;
-  color:#555;
+/* RIGHT SIDEBAR */
+
+.right-sidebar{
+width:160px;
+display:flex;
+flex-direction:column;
+border-left:1px solid #ddd;
 }
 
-/* MARKDOWN */
-#preview h1{font-size:22px}
-#preview h2{font-size:18px}
-#preview pre{background:#f1f1f1;padding:8px;border-radius:6px}
-#preview code{background:#f1f1f1;padding:2px 4px;border-radius:4px}
-#preview ul{padding-left:18px}
-
-/* COMMAND PALETTE */
-#palette{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:white;
-  width:320px;
-  border-radius:8px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  display:none;
-  flex-direction:column;
-}
-#palette input{
-  border:none;
-  border-bottom:1px solid #eee;
-  padding:10px;
-  outline:none;
-}
-.paletteItem{
-  padding:8px;
-  cursor:pointer;
-}
-.paletteItem:hover{
-  background:#f5f6f8;
+.sidebar-header{
+display:flex;
+gap:6px;
+padding:6px;
+border-bottom:1px solid #eee;
 }
 
-/* RIGHT TODO SIDEBAR */
-#todoSidebar{
-  width:160px;
-  background:white;
-  border-left:1px solid #eee;
-  display:flex;
-  flex-direction:column;
-  transition: all 0.2s;
-}
-#todoHeader{
-  padding:4px;
-  display:flex;
-  gap:4px;
-  justify-content:space-between;
-  align-items:center;
-  font-size:11px;
-  border-bottom:1px solid #eee;
-}
-.todoBtn{
-  cursor:pointer;
-  font-size:11px;
-  padding:2px 4px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
-}
-#todoButtons{
-  display:flex;
-  gap:2px;
-  flex-wrap:nowrap;
-}
-#todoContent, #todoPreview{
-  flex:1;
-  padding:4px;
-  font-size:11px;
-  border:none;
-  resize:none;
-  outline:none;
-  font-family:monospace;
-}
-#todoPreview{
-  display:none;
-  overflow:auto;
+.sidebar-header button{
+font-size:12px;
+padding:4px 6px;
+cursor:pointer;
 }
 
-/* FLOATING SHOW BUTTON */
-#showTodoBtn{
-  display:none;
-  position:fixed;
-  top:50%;
-  right:0;
-  transform:translateY(-50%);
-  padding:4px 6px;
-  font-size:11px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
-  cursor:pointer;
-}
-
-/* MOBILE OPTIMIZATIONS */
-@media(max-width:900px){
-  #container{flex-direction:column;}
-  #sidebar,#todoSidebar{width:100%;height:auto;max-height:140px;display:flex;overflow-x:auto;border:none;border-bottom:1px solid #eee;}
-  #pages{display:flex;gap:4px;flex-wrap:nowrap;}
-  .page{flex:0 0 auto;border-bottom:none;border-right:1px solid #eee;padding:2px 4px;font-size:10px;}
-  #editorCard{margin:5px;}
-  #title{font-size:14px;padding:8px;}
-  #content,#preview{font-size:13px;padding:6px;}
-  #mode button{padding:3px 5px;font-size:11px;}
-  #tags,#stats,#backlinks{font-size:10px;padding:3px 6px;}
-  #preview{min-height:180px;}
-}
-@media(max-width:400px){
-  #topbar{flex-direction:column;gap:4px;padding:4px;}
-  #search{width:100%;font-size:12px;padding:4px;}
-  .topbtn{width:100%;font-size:11px;padding:4px 6px;}
-}
 </style>
 </head>
 
 <body>
-<div id="topbar">
-<input id="search" placeholder="Search notes (Ctrl + /)">
-<button class="topbtn" onclick="exportNotes()">Export</button>
-<button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
-<input type="file" id="importFile" style="display:none">
+
+<div class="app">
+
+<!-- LEFT SIDEBAR -->
+
+<aside class="left-sidebar">
+
+<div class="pages-list" id="pages">
+<div class="page-item">Page 1</div>
+<div class="page-item">Page 2</div>
+<div class="page-item">Page 3</div>
 </div>
 
-<div id="container">
-  <!-- LEFT SIDEBAR -->
-  <div id="sidebar">
-    <div id="pages"></div>
-    <button id="newPage">+ New Page</button>
-  </div>
-
-  <!-- MAIN EDITOR -->
-  <div id="editorCard">
-    <input id="title" placeholder="Title">
-    <div id="mode">
-      <button onclick="setMode('edit')">Edit</button>
-      <button onclick="setMode('preview')">Preview</button>
-      <button onclick="togglePin()">Pin</button>
-      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-    </div>
-    <textarea id="content"></textarea>
-    <div id="preview"></div>
-    <div id="tags"></div>
-    <div id="stats"></div>
-    <div id="backlinks"></div>
-  </div>
-
-  <!-- RIGHT TODO SIDEBAR -->
-  <div id="todoSidebar">
-    <div id="todoHeader">
-      <span>Todo List</span>
-      <div id="todoButtons">
-        <button class="todoBtn" onclick="setTodoMode('edit')">Edit</button>
-        <button class="todoBtn" onclick="setTodoMode('preview')">Preview</button>
-        <button class="todoBtn" onclick="toggleTodo()">⇄</button>
-      </div>
-    </div>
-    <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
-    <div id="todoPreview"></div>
-  </div>
+<div class="sidebar-buttons">
+<button onclick="addPage()">+ New Page</button>
+<button onclick="exportData()">Export</button>
+<button onclick="triggerImport()">Import</button>
+<input type="file" id="importFile" style="display:none" onchange="importData(event)">
 </div>
 
-<!-- FLOATING SHOW BUTTON -->
-<button id="showTodoBtn" onclick="toggleTodo()">Show Todo</button>
+</aside>
 
-<div id="palette">
-<input id="paletteSearch" placeholder="Jump to note...">
-<div id="paletteList"></div>
+<!-- MAIN EDITOR -->
+
+<main class="main-editor">
+<textarea id="main-editor"></textarea>
+</main>
+
+<!-- RIGHT SIDEBAR -->
+
+<aside class="right-sidebar">
+
+<div class="sidebar-header">
+<button onclick="toggleEdit()">edit</button>
+<button onclick="togglePreview()">preview</button>
+<button onclick="toggleSidebar()">hide</button>
 </div>
+
+<textarea id="todo-editor"></textarea>
+
+</aside>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 
 <script>
-// --- NOTES ---
-let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
-let current = null
-let mode="edit"
 
-// --- TODO ---
-let todoVisible = true
-let todoMode = "edit"
-todoContent.value = localStorage.getItem("globalTodo") || ""
+/* MAIN EDITOR */
 
-// SAVE NOTES
-function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
-// SAVE TODO
-function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
+const mainEditor = new SimpleMDE({
+element: document.getElementById("main-editor"),
+spellChecker:false
+})
 
-// --- TAGS & LINKS ---
-function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
-function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
+/* TODO EDITOR */
 
-// --- SIDEBAR ---
-function renderPages(filter=""){
-    let pinned=[],others=[]
-    notes.forEach(n=>{
-        if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
-        if(n.pinned) pinned.push(n)
-        else others.push(n)
-    })
-    pinned.sort((a,b)=>b.created-a.created)
-    others.sort((a,b)=>b.created-a.created)
-    pages.innerHTML=""
-    function renderList(list){
-        list.forEach(n=>{
-            let div=document.createElement("div")
-            div.className="page"+(n.id===current?" active":"")
-            let t=document.createElement("span");t.textContent=n.title
-            let date=document.createElement("span")
-            let d=new Date(n.created)
-            date.textContent=`${d.getDate()}/${d.getMonth()+1}`
-            date.className="dateLabel"
-            let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"📌":""
-            div.appendChild(t);div.appendChild(date);div.appendChild(p)
-            div.onclick=()=>openNote(n.id)
-            pages.appendChild(div)
-        })
-    }
-    renderList(pinned)
-    renderList(others)
+const todoEditor = new SimpleMDE({
+element: document.getElementById("todo-editor"),
+toolbar:false,
+status:false,
+spellChecker:false
+})
+
+/* AUTOSAVE */
+
+if(localStorage.getItem("mainMarkdown")){
+mainEditor.value(localStorage.getItem("mainMarkdown"))
 }
 
-// --- NEW NOTE ---
-newPage.onclick=()=>{
-    let id=Date.now()
-    let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
-    notes.unshift(note)
-    save()
-    openNote(id)
+if(localStorage.getItem("todoMarkdown")){
+todoEditor.value(localStorage.getItem("todoMarkdown"))
 }
 
-// --- OPEN NOTE ---
-function openNote(id){
-    current=id
-    let note=notes.find(n=>n.id===id)
-    title.value=note.title
-    content.value=note.content
-    renderMeta(note)
-    if(mode==="preview") renderPreview()
-    renderPages()
+setInterval(()=>{
+
+localStorage.setItem("mainMarkdown", mainEditor.value())
+localStorage.setItem("todoMarkdown", todoEditor.value())
+
+},1000)
+
+/* NEW PAGE */
+
+function addPage(){
+
+const pages=document.getElementById("pages")
+
+const div=document.createElement("div")
+div.className="page-item"
+div.textContent="New Page"
+
+pages.appendChild(div)
+
 }
 
-// --- META PANELS ---
-function renderMeta(note){
-    tags.innerText="Tags: "+getTags(note.content).join(" ")
-    let links=getLinks(note.content)
-    let words=note.content.split(/\s+/).filter(Boolean).length
-    let chars=note.content.length
-    stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
-    let refs=[]
-    notes.forEach(n=>{if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n.title)})
-    backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
+/* EXPORT */
+
+function exportData(){
+
+const data={
+main:mainEditor.value(),
+todo:todoEditor.value()
 }
 
-// --- TITLE & CONTENT ---
-title.oninput=e=>{let n=notes.find(x=>x.id===current);n.title=e.target.value;n.updated=Date.now();save();renderPages()}
-content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value;n.updated=Date.now();save();renderMeta(n);if(mode==="preview") renderPreview()}
+const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"})
+const url=URL.createObjectURL(blob)
 
-// --- PIN / DELETE ---
-function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
-function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
+const a=document.createElement("a")
+a.href=url
+a.download="markdown_notes_backup.json"
+a.click()
 
-// --- MARKDOWN PREVIEW ---
-function renderPreview(){
-    let html=marked.parse(content.value)
-    html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-        let note=notes.find(n=>n.title===name)
-        if(!note){let id=Date.now();note={id,title:name,content:"",created:id,updated:id,pinned:false};notes.push(note);save()}
-        return "<a href='#' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-    })
-    preview.innerHTML=html
 }
 
-// --- MODE ---
-function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
+/* IMPORT */
 
-// --- TODO MODE ---
-function setTodoMode(m){
-    todoMode=m
-    if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
-    else{todoPreview.innerHTML=marked.parse(todoContent.value);todoContent.style.display="none";todoPreview.style.display="block"}
+function triggerImport(){
+document.getElementById("importFile").click()
 }
 
-// --- TOGGLE TODO ---
-function toggleTodo(){
-    todoVisible=!todoVisible
-    todoSidebar.style.display = todoVisible ? "flex" : "none"
-    showTodoBtn.style.display = todoVisible ? "none" : "block"
+function importData(event){
+
+const file=event.target.files[0]
+if(!file)return
+
+const reader=new FileReader()
+
+reader.onload=function(e){
+
+const data=JSON.parse(e.target.result)
+
+if(data.main){
+mainEditor.value(data.main)
 }
 
-// --- SEARCH ---
-search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
+if(data.todo){
+todoEditor.value(data.todo)
+}
 
-// --- EXPORT / IMPORT ---
-function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
-importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
+}
 
-// --- INIT ---
-if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
-openNote(notes[0].id)
-todoContent.oninput=saveTodo
+reader.readAsText(file)
+
+}
+
+/* SIDEBAR BUTTONS */
+
+function toggleEdit(){
+todoEditor.togglePreview()
+}
+
+function togglePreview(){
+todoEditor.togglePreview()
+}
+
+function toggleSidebar(){
+
+const sidebar=document.querySelector(".right-sidebar")
+
+if(sidebar.style.display==="none"){
+sidebar.style.display="flex"
+}else{
+sidebar.style.display="none"
+}
+
+}
+
 </script>
+
 </body>
 </html>
