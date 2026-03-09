@@ -294,6 +294,27 @@ body{
   #search{width:100%;font-size:12px;padding:4px;}
   .topbtn{width:100%;font-size:11px;padding:4px 6px;}
 }
+  #linkSuggest{
+  position:absolute;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:6px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.15);
+  display:none;
+  max-height:160px;
+  overflow:auto;
+  font-size:12px;
+  z-index:999;
+}
+
+.linkItem{
+  padding:6px 8px;
+  cursor:pointer;
+}
+
+.linkItem:hover{
+  background:#f0f4ff;
+}
 </style>
 </head>
 
@@ -353,7 +374,7 @@ body{
 <input id="paletteSearch" placeholder="Jump to note...">
 <div id="paletteList"></div>
 </div>
-
+<div id="linkSuggest"></div>
 <script>
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
@@ -554,6 +575,59 @@ todoContent.oninput = ()=>{
     todoPreview.innerHTML = marked.parse(todoContent.value)
   }
 }
+  const linkSuggest = document.getElementById("linkSuggest")
+
+content.addEventListener("keyup", function(e){
+
+  let pos = content.selectionStart
+  let text = content.value.substring(0,pos)
+
+  let match = text.match(/\[\[([^\[]*)$/)
+
+  if(match){
+
+    let query = match[1].toLowerCase()
+
+    let results = notes.filter(n =>
+      n.title.toLowerCase().includes(query)
+    )
+
+    if(results.length===0){
+      linkSuggest.style.display="none"
+      return
+    }
+
+    linkSuggest.innerHTML=""
+
+    results.slice(0,8).forEach(n=>{
+      let div=document.createElement("div")
+      div.className="linkItem"
+      div.textContent=n.title
+
+      div.onclick=()=>{
+        let start = text.lastIndexOf("[[")
+        let before = content.value.substring(0,start)
+        let after = content.value.substring(pos)
+
+        content.value = before + "[["+n.title+"]]" + after
+        linkSuggest.style.display="none"
+
+        content.focus()
+      }
+
+      linkSuggest.appendChild(div)
+    })
+
+    let rect = content.getBoundingClientRect()
+    linkSuggest.style.left = rect.left + 20 + "px"
+    linkSuggest.style.top = rect.top + 60 + "px"
+    linkSuggest.style.display="block"
+
+  } else {
+    linkSuggest.style.display="none"
+  }
+
+})
 </script>
 </body>
 </html>
