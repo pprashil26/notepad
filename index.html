@@ -356,6 +356,11 @@ body{
 /* Slight background tint for modes */
 #editorCard.editMode {background: #fff;}
 #editorCard.previewMode {background: #f9faff;}
+#mode button.activeMode {
+  background:#2f7ef7;
+  color:white;
+  border-color:#1c5fd1;
+}
 </style>
 </head>
 
@@ -531,9 +536,23 @@ function renderPreview(){
 
 /* MODE */
 function setMode(m){
-  mode = m
-  if(m==="edit"){content.style.display="block"; preview.style.display="none"; editorCard.classList.add("editMode"); editorCard.classList.remove("previewMode")}
-  else{renderPreview(); content.style.display="none"; preview.style.display="block"; editorCard.classList.add("previewMode"); editorCard.classList.remove("editMode")}
+  mode = m;
+
+  // Always show content/preview according to mode
+  if(m === "edit"){
+    content.style.display = "block";
+    preview.style.display = "none";
+  } else {
+    renderPreview();
+    content.style.display = "none";
+    preview.style.display = "block";
+  }
+
+  // Highlight buttons
+  document.querySelectorAll("#mode button").forEach(btn => {
+    btn.classList.remove("activeMode");
+  });
+  document.querySelector(`#mode button[onclick="setMode('${m}')"]`).classList.add("activeMode");
 }
 
 /* TODO MODE */
