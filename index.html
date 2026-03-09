@@ -332,6 +332,13 @@ body{
   display:none;
   z-index:999;
 }
+/* Slight background tint for modes */
+#editorCard.editMode {
+  background: #fff;       /* normal white for edit */
+}
+#editorCard.previewMode {
+  background: #f9faff;    /* light bluish tint for preview */
+}
 </style>
 </head>
 
@@ -523,7 +530,22 @@ let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
 }
 
 /* MODE */
-function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
+function setMode(m){
+  mode = m;
+
+  if(m === "edit"){
+    content.style.display = "block";
+    preview.style.display = "none";
+    editorCard.classList.add("editMode");
+    editorCard.classList.remove("previewMode");
+  } else {
+    renderPreview();
+    content.style.display = "none";
+    preview.style.display = "block";
+    editorCard.classList.add("previewMode");
+    editorCard.classList.remove("editMode");
+  }
+}
 
 /* TODO MODE */
 function setTodoMode(m){
