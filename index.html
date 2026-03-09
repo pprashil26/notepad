@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad with Bottom New Page</title>
+<title>Markdown Knowledge Notepad with Markdown Todo</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -338,17 +338,18 @@ let mode="edit"
 // --- TODO ---
 let todoVisible = true
 let todoMode = "edit"
+todoContent.value = localStorage.getItem("globalTodo") || ""
 
 // SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
 // SAVE TODO
 function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
-/* TAGS & LINKS */
+// --- TAGS & LINKS ---
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
-/* SIDEBAR RENDER */
+// --- SIDEBAR ---
 function renderPages(filter=""){
     let pinned=[],others=[]
     notes.forEach(n=>{
@@ -378,7 +379,7 @@ function renderPages(filter=""){
     renderList(others)
 }
 
-/* NEW NOTE */
+// --- NEW NOTE ---
 newPage.onclick=()=>{
     let id=Date.now()
     let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
@@ -387,7 +388,7 @@ newPage.onclick=()=>{
     openNote(id)
 }
 
-/* OPEN NOTE */
+// --- OPEN NOTE ---
 function openNote(id){
     current=id
     let note=notes.find(n=>n.id===id)
@@ -398,7 +399,7 @@ function openNote(id){
     renderPages()
 }
 
-/* META PANELS */
+// --- META PANELS ---
 function renderMeta(note){
     tags.innerText="Tags: "+getTags(note.content).join(" ")
     let links=getLinks(note.content)
@@ -410,15 +411,15 @@ function renderMeta(note){
     backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
 }
 
-/* TITLE & CONTENT */
+// --- TITLE & CONTENT ---
 title.oninput=e=>{let n=notes.find(x=>x.id===current);n.title=e.target.value;n.updated=Date.now();save();renderPages()}
 content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value;n.updated=Date.now();save();renderMeta(n);if(mode==="preview") renderPreview()}
 
-/* PIN / DELETE */
+// --- PIN / DELETE ---
 function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
-/* MARKDOWN */
+// --- MARKDOWN PREVIEW ---
 function renderPreview(){
     let html=marked.parse(content.value)
     html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
@@ -429,37 +430,34 @@ function renderPreview(){
     preview.innerHTML=html
 }
 
-/* MODE */
+// --- MODE ---
 function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
 
-/* TODO MODE */
+// --- TODO MODE ---
 function setTodoMode(m){
-  todoMode = m
-  if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
-  else{todoPreview.innerHTML=todoContent.value;todoContent.style.display="none";todoPreview.style.display="block"}
+    todoMode=m
+    if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
+    else{todoPreview.innerHTML=marked.parse(todoContent.value);todoContent.style.display="none";todoPreview.style.display="block"}
 }
 
-/* TOGGLE TODO */
+// --- TOGGLE TODO ---
 function toggleTodo(){
     todoVisible=!todoVisible
     todoSidebar.style.display = todoVisible ? "flex" : "none"
     showTodoBtn.style.display = todoVisible ? "none" : "block"
 }
 
-/* SEARCH */
+// --- SEARCH ---
 search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 
-/* EXPORT / IMPORT */
+// --- EXPORT / IMPORT ---
 function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
 importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
 
-/* INIT */
+// --- INIT ---
 if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
 openNote(notes[0].id)
-
-/* INIT TODO */
-todoContent.value = localStorage.getItem("globalTodo") || ""
-todoContent.oninput = saveTodo
+todoContent.oninput=saveTodo
 </script>
 </body>
 </html>
