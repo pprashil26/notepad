@@ -471,6 +471,13 @@ todoContent.oninput = ()=>{
   saveTodo()
   if(todoMode==="preview") todoPreview.innerHTML = marked.parse(todoContent.value)
 }
+  // Ctrl + / to focus search
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key === "/") {
+    e.preventDefault();
+    search.focus();
+  }
+});
 </script>
 </body>
 </html>
