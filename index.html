@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad</title>
+<title>Markdown Knowledge Notepad with Todo Sidebar</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -48,9 +48,9 @@ body{
   overflow:hidden;
 }
 
-/* SIDEBAR */
+/* LEFT SIDEBAR */
 #sidebar{
-  width:160px; /* very compact */
+  width:160px;
   background:white;
   border-right:1px solid #eee;
   display:flex;
@@ -74,7 +74,7 @@ body{
   padding:3px 5px;
   cursor:pointer;
   border-bottom:1px solid #f1f1f1;
-  font-size:11px;      /* compact title */
+  font-size:11px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -87,17 +87,17 @@ body{
   background:#e8f0ff;
 }
 .pin{
-  font-size:10px;       /* compact pin */
+  font-size:10px;
   color:#999;
   margin-left:4px;
 }
 .dateLabel{
-  font-size:9px;        /* ultra-compact date */
+  font-size:9px;
   color:#999;
   margin-left:4px;
 }
 
-/* EDITOR */
+/* MAIN EDITOR */
 #editorCard{
   flex:1;
   margin:10px;
@@ -193,30 +193,48 @@ body{
   background:#f5f6f8;
 }
 
+/* RIGHT TODO SIDEBAR */
+#todoSidebar{
+  width:160px;
+  background:white;
+  border-left:1px solid #eee;
+  display:flex;
+  flex-direction:column;
+  transition: all 0.2s;
+}
+#todoHeader{
+  padding:4px;
+  font-size:11px;
+  font-weight:600;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #eee;
+}
+#todoToggle{
+  cursor:pointer;
+  font-size:11px;
+  padding:2px 4px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  background:#f5f5f5;
+}
+#todoContent{
+  flex:1;
+  padding:4px;
+  font-size:11px;
+  border:none;
+  resize:none;
+  outline:none;
+  font-family:monospace;
+}
+
 /* MOBILE OPTIMIZATIONS */
-@media(max-width:700px){
+@media(max-width:900px){
   #container{flex-direction:column;}
-  #sidebar{
-    width:100%;
-    height:auto;
-    max-height:140px;
-    display:flex;
-    overflow-x:auto;
-    border-right:none;
-    border-bottom:1px solid #eee;
-  }
-  #pages{
-    display:flex;
-    gap:4px;
-    flex-wrap:nowrap;
-  }
-  .page{
-    flex:0 0 auto;
-    border-bottom:none;
-    border-right:1px solid #eee;
-    padding:2px 4px;
-    font-size:10px;
-  }
+  #sidebar,#todoSidebar{width:100%;height:auto;max-height:140px;display:flex;overflow-x:auto;border:none;border-bottom:1px solid #eee;}
+  #pages{display:flex;gap:4px;flex-wrap:nowrap;}
+  .page{flex:0 0 auto;border-bottom:none;border-right:1px solid #eee;padding:2px 4px;font-size:10px;}
   #editorCard{margin:5px;}
   #title{font-size:14px;padding:8px;}
   #content,#preview{font-size:13px;padding:6px;}
@@ -241,11 +259,13 @@ body{
 </div>
 
 <div id="container">
+<!-- LEFT SIDEBAR -->
 <div id="sidebar">
 <button id="newPage">+ New Page</button>
 <div id="pages"></div>
 </div>
 
+<!-- MAIN EDITOR -->
 <div id="editorCard">
 <input id="title" placeholder="Title">
 <div id="mode">
@@ -260,6 +280,15 @@ body{
 <div id="stats"></div>
 <div id="backlinks"></div>
 </div>
+
+<!-- RIGHT TODO SIDEBAR -->
+<div id="todoSidebar">
+<div id="todoHeader">
+  <span>Todo List</span>
+  <span id="todoToggle" onclick="toggleTodo()">⇄</span>
+</div>
+<textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
+</div>
 </div>
 
 <div id="palette">
@@ -271,12 +300,16 @@ body{
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode="edit"
+let todoVisible = true
 
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
+function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
+/* TAGS & LINKS */
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
+/* SIDEBAR RENDER */
 function renderPages(filter=""){
     let pinned=[],others=[]
     notes.forEach(n=>{
@@ -294,7 +327,7 @@ function renderPages(filter=""){
             let t=document.createElement("span");t.textContent=n.title
             let date=document.createElement("span")
             let d=new Date(n.created)
-            date.textContent=`${d.getDate()}/${d.getMonth()+1}` // DD/MM format
+            date.textContent=`${d.getDate()}/${d.getMonth()+1}`
             date.className="dateLabel"
             let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"📌":""
             div.appendChild(t);div.appendChild(date);div.appendChild(p)
@@ -306,6 +339,7 @@ function renderPages(filter=""){
     renderList(others)
 }
 
+/* NEW NOTE */
 newPage.onclick=()=>{
     let id=Date.now()
     let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
@@ -314,6 +348,7 @@ newPage.onclick=()=>{
     openNote(id)
 }
 
+/* OPEN NOTE */
 function openNote(id){
     current=id
     let note=notes.find(n=>n.id===id)
@@ -324,6 +359,7 @@ function openNote(id){
     renderPages()
 }
 
+/* META PANELS */
 function renderMeta(note){
     tags.innerText="Tags: "+getTags(note.content).join(" ")
     let links=getLinks(note.content)
@@ -335,12 +371,15 @@ function renderMeta(note){
     backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
 }
 
+/* TITLE & CONTENT */
 title.oninput=e=>{let n=notes.find(x=>x.id===current);n.title=e.target.value;n.updated=Date.now();save();renderPages()}
 content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value;n.updated=Date.now();save();renderMeta(n);if(mode==="preview") renderPreview()}
 
+/* PIN / DELETE */
 function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
+/* MARKDOWN */
 function renderPreview(){
     let html=marked.parse(content.value)
     html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
@@ -351,23 +390,34 @@ function renderPreview(){
     preview.innerHTML=html
 }
 
+/* MODE */
 function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
 
+/* SEARCH */
 search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 
+/* EXPORT / IMPORT */
 function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
 importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
 
+/* COMMAND PALETTE */
 document.addEventListener("keydown",e=>{
     if(e.ctrlKey && e.key==="/"){e.preventDefault();search.focus()}
     if(e.ctrlKey && e.key==="k"){e.preventDefault();palette.style.display="flex";paletteSearch.focus();renderPalette()}})
-
 function renderPalette(filter=""){paletteList.innerHTML="";notes.filter(n=>n.title.toLowerCase().includes(filter)).forEach(n=>{let d=document.createElement("div");d.className="paletteItem";d.textContent=n.title;d.onclick=()=>{openNote(n.id);palette.style.display="none"};paletteList.appendChild(d)})}
 paletteSearch.oninput=e=>{renderPalette(e.target.value.toLowerCase())}
 
+/* INIT */
 if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
 openNote(notes[0].id)
-renderPages()
+
+/* TODO SIDEBAR */
+todoContent.value = localStorage.getItem("globalTodo") || ""
+todoContent.oninput = saveTodo
+function toggleTodo(){
+    todoVisible=!todoVisible
+    todoSidebar.style.display = todoVisible ? "flex" : "none"
+}
 </script>
 
 </body>
