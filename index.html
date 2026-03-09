@@ -168,26 +168,23 @@ body{
   outline:none;
   background:white;
 }
-#content {
+#editorCard {
   flex:1;
-  min-height:0;
-  border:none;
-  padding:16px 20px;
-  font-family:Consolas, "Courier New", monospace;
-  font-size:15px;
-  line-height:1.8;
-  outline:none;
-  resize:none;
+  margin:12px;
   background:white;
-  overflow-y:auto;
-  max-width:900px;
-  margin:auto;
-  width:100%;
+  border-radius:12px;
+  border:1px solid #e6e6e6;
+  display:flex;
+  flex-direction:column;
+  /* overflow:hidden;  REMOVE THIS */
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s ease;
+  min-height:0; /* ensure flex children can scroll */
 }
 
 #preview {
   flex:1;
-  min-height:0;
+  min-height:0; /* allow shrinking inside flex */
   padding:24px 28px;
   font-size:16px;
   line-height:1.8;
@@ -195,8 +192,9 @@ body{
   max-width:900px;
   margin:auto;
   width:100%;
-  background:#fcfdff; /* subtle preview background */
+  background:#fcfdff;
   border-radius:8px;
+  scroll-behavior: smooth;
 }
 
 /* META PANELS */
@@ -406,6 +404,7 @@ text-align:center;
   width:100%;
   margin:auto;
   word-wrap:break-word;
+  scroll-behavior: smooth;
 }
 #editorCard.darkMode #content, #editorCard.darkMode #preview {
   background:#1e1e1e;
@@ -596,14 +595,15 @@ function renderPreview(){
 function setMode(m){
   mode = m;
 
-  // Always show content/preview according to mode
   if(m === "edit"){
     content.style.display = "block";
     preview.style.display = "none";
+    content.scrollTop = 0; // scroll top when entering edit
   } else {
     renderPreview();
     content.style.display = "none";
     preview.style.display = "block";
+    preview.scrollTop = 0; // scroll top when entering preview
   }
 
   // Highlight buttons
@@ -668,7 +668,7 @@ importFile.onchange=e=>{
 
 /* OPEN NOTE */
 /* OPEN NOTE */
-function openNote(id, isNew = false) {  // added isNew flag
+function openNote(id, isNew = false) {
   current = id;
   let note = notes.find(n => n.id === id);
 
@@ -685,13 +685,17 @@ function openNote(id, isNew = false) {  // added isNew flag
   }, 0);
 
   // Set mode:
-  // - New note -> edit mode
-  // - Existing note -> preview mode
   if (isNew) {
     setMode("edit");
   } else {
     setMode("preview");
   }
+
+  // --- SCROLL FIX FOR LONG NOTES ---
+  setTimeout(() => {
+    content.scrollTop = 0; // Edit mode scrolls to top
+    preview.scrollTop = 0; // Preview mode scrolls to top
+  }, 0);
 }
 /* INIT NOTES */
 if(notes.length===0){
