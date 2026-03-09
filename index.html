@@ -333,7 +333,7 @@ body{
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
-let mode="edit"
+let mode="preview"
 
 // --- TODO ---
 let todoVisible = true
@@ -417,7 +417,7 @@ content.oninput=e=>{let n=notes.find(x=>x.id===current);n.content=e.target.value
 /* PIN / DELETE */
 function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save();renderPages()}
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
-
+setMode("preview")
 /* MARKDOWN */
 function renderPreview(){
     let html=marked.parse(content.value)
