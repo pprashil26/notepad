@@ -315,6 +315,21 @@ body{
 .linkItem:hover{
   background:#f0f4ff;
 }
+/* LINK HOVER PREVIEW */
+#hoverPreview{
+  position:absolute;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:8px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  padding:10px;
+  width:260px;
+  max-height:200px;
+  overflow:auto;
+  font-size:12px;
+  display:none;
+  z-index:999;
+}
 </style>
 </head>
 
@@ -432,27 +447,45 @@ newPage.onclick=()=>{
     openNote(id)
 }
 
-/* OPEN NOTE */
-function openNote(id){
-    current=id
-    let note=notes.find(n=>n.id===id)
-    title.value=note.title
-    content.value=note.content
-    renderMeta(note)
-    if(mode==="preview") renderPreview()
-    renderPages()
-}
-
 /* META PANELS */
 function renderMeta(note){
+
     tags.innerText="Tags: "+getTags(note.content).join(" ")
+
     let links=getLinks(note.content)
     let words=note.content.split(/\s+/).filter(Boolean).length
     let chars=note.content.length
+
     stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
+
     let refs=[]
-    notes.forEach(n=>{if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n.title)})
-    backlinks.innerText="Backlinks: "+(refs.join(", ")||"None")
+
+    notes.forEach(n=>{
+        if(n.id!==note.id && getLinks(n.content).includes(note.title)){
+            refs.push(n)
+        }
+    })
+
+    if(refs.length===0){
+        backlinks.innerHTML="Backlinks: None"
+        return
+    }
+
+    backlinks.innerHTML="Backlinks: "
+
+    refs.forEach((n,i)=>{
+        let a=document.createElement("a")
+        a.href="#"
+        a.textContent=n.title
+        a.style.marginRight="6px"
+
+        a.onclick=(e)=>{
+            e.preventDefault()
+            openNote(n.id)
+        }
+
+        backlinks.appendChild(a)
+    })
 }
 
 /* TITLE & CONTENT */
@@ -464,15 +497,7 @@ function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
 /* MARKDOWN */
-function renderPreview(){
-    let html=marked.parse(content.value)
-    html=html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-        let note=notes.find(n=>n.title===name)
-        if(!note){let id=Date.now();note={id,title:name,content:"",created:id,updated:id,pinned:false};notes.push(note);save()}
-        return "<a href='#' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-    })
-    preview.innerHTML=html
-}
+return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
 
 /* MODE */
 function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
@@ -618,13 +643,49 @@ content.addEventListener("keyup", function(e){
       linkSuggest.appendChild(div)
     })
 
-    let rect = content.getBoundingClientRect()
-    linkSuggest.style.left = rect.left + 20 + "px"
-    linkSuggest.style.top = rect.top + 60 + "px"
-    linkSuggest.style.display="block"
+let rect = content.getBoundingClientRect()
+
+let lineHeight = 18
+let lines = content.value.substr(0, content.selectionStart).split("\n").length
+
+<div id="hoverPreview"></div>
+
+linkSuggest.style.left = rect.left + 20 + "px"
+linkSuggest.style.top = rect.top + (lines * lineHeight) + 40 + "px"
+linkSuggest.style.display="block"
 
   } else {
     linkSuggest.style.display="none"
+  }
+
+})
+const hoverPreview = document.getElementById("hoverPreview")
+
+preview.addEventListener("mouseover", function(e){
+
+  if(e.target.classList.contains("noteLink")){
+
+    let id = Number(e.target.dataset.id)
+    let note = notes.find(n=>n.id===id)
+
+    if(!note) return
+
+    let rect = e.target.getBoundingClientRect()
+
+    hoverPreview.style.left = rect.right + 10 + "px"
+    hoverPreview.style.top = rect.top + "px"
+
+    hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
+
+    hoverPreview.style.display="block"
+  }
+
+})
+
+preview.addEventListener("mouseout", function(e){
+
+  if(e.target.classList.contains("noteLink")){
+    hoverPreview.style.display="none"
   }
 
 })
