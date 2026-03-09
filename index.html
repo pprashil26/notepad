@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad with Markdown Todo Sidebar</title>
+<title>Markdown Knowledge Notepad with Redesigned Todo Sidebar</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -204,20 +204,25 @@ body{
 }
 #todoHeader{
   padding:4px;
-  font-size:11px;
-  font-weight:600;
   display:flex;
+  gap:4px;
   justify-content:space-between;
   align-items:center;
+  font-size:11px;
   border-bottom:1px solid #eee;
 }
-#todoToggle{
+.todoBtn{
   cursor:pointer;
   font-size:11px;
   padding:2px 4px;
   border-radius:4px;
   border:1px solid #ccc;
   background:#f5f5f5;
+}
+#todoButtons{
+  display:flex;
+  gap:2px;
+  flex-wrap:nowrap;
 }
 #todoContent, #todoPreview{
   flex:1;
@@ -304,11 +309,11 @@ body{
   <div id="todoSidebar">
     <div id="todoHeader">
       <span>Todo List</span>
-      <span id="todoToggle" onclick="toggleTodo()">⇄</span>
-      <span>
-        <button onclick="setTodoMode('edit')">Edit</button>
-        <button onclick="setTodoMode('preview')">Preview</button>
-      </span>
+      <div id="todoButtons">
+        <button class="todoBtn" onclick="setTodoMode('edit')">Edit</button>
+        <button class="todoBtn" onclick="setTodoMode('preview')">Preview</button>
+        <button class="todoBtn" onclick="toggleTodo()">⇄</button>
+      </div>
     </div>
     <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
     <div id="todoPreview"></div>
@@ -457,6 +462,5 @@ function toggleTodo(){
     showTodoBtn.style.display = todoVisible ? "none" : "block"
 }
 </script>
-
 </body>
 </html>
