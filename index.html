@@ -295,20 +295,21 @@ body{
   </div>
 
   <!-- MAIN EDITOR -->
-  <div id="editorCard">
-    <input id="title" placeholder="Title">
-    <div id="mode">
-      <button onclick="setMode('edit')">Edit</button>
-      <button onclick="setMode('preview')">Preview</button>
-      <button onclick="togglePin()">Pin</button>
-      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-    </div>
-    <textarea id="content"></textarea>
-    <div id="preview"></div>
-    <div id="tags"></div>
-    <div id="stats"></div>
-    <div id="backlinks"></div>
+<!-- MAIN EDITOR -->
+<div id="editorCard">
+  <div id="mode">
+    <button onclick="setMode('edit')">Edit</button>
+    <button onclick="setMode('preview')">Preview</button>
+    <button onclick="togglePin()">Pin</button>
+    <button id="deleteBtn" onclick="deleteNote()">Delete</button>
   </div>
+  <input id="title" placeholder="Title">
+  <textarea id="content"></textarea>
+  <div id="preview"></div>
+  <div id="tags"></div>
+  <div id="stats"></div>
+  <div id="backlinks"></div>
+</div>
 
   <!-- RIGHT TODO SIDEBAR -->
   <div id="todoSidebar">
