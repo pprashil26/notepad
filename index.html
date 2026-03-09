@@ -411,6 +411,23 @@ text-align:center;
   background:#1e1e1e;
   color:#eaeaea;
 }
+body.focusMode #sidebar,
+body.focusMode #todoSidebar,
+body.focusMode #topbar {
+  display: none !important;
+}
+
+body.focusMode #editorCard {
+  flex: 1 1 100% !important;
+  margin: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.focusMode #editorCard {
+  transition: all 0.3s ease;
+}
 </style>
 </head>
 
@@ -436,6 +453,7 @@ text-align:center;
       <button onclick="setMode('edit')">Edit</button>
       <button onclick="setMode('preview')">Preview</button>
       <button onclick="togglePin()">Pin</button>
+	  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
       <button id="deleteBtn" onclick="deleteNote()">Delete</button>
     </div>
     <input id="title" placeholder="Title">
@@ -711,6 +729,14 @@ stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerTex
 // Ctrl + / to focus search
 document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preventDefault(); search.focus()}})
 
+// Ctrl + F to toggle Focus Mode
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key.toLowerCase() === "f") {
+    e.preventDefault();
+    toggleFocusMode();
+  }
+});
+
 // LINK SUGGEST & HOVER PREVIEW
 const linkSuggest = document.getElementById("linkSuggest")
 const hoverPreview = document.getElementById("hoverPreview")
@@ -768,6 +794,39 @@ marked.setOptions({
   gfm: true,
   breaks: true
 });
+let focusMode = false;
+
+let focusMode = false;
+let prevMode = mode;         // store previous edit/preview mode
+let prevTodoVisible = todoVisible;
+
+function toggleFocusMode() {
+  focusMode = !focusMode;
+  document.body.classList.toggle("focusMode", focusMode);
+
+  // Highlight the button
+  focusBtn.classList.toggle("activeMode", focusMode);
+
+  if (focusMode) {
+    // Save previous state
+    prevMode = mode;
+    prevTodoVisible = todoVisible;
+
+    // Enter edit mode for distraction-free typing
+    setMode("edit");
+
+    // Hide floating todo button
+    showTodoBtn.style.display = "none";
+  } else {
+    // Restore previous mode
+    setMode(prevMode);
+
+    // Restore todo sidebar visibility
+    todoVisible = prevTodoVisible;
+    todoSidebar.style.display = todoVisible ? "flex" : "none";
+    showTodoBtn.style.display = todoVisible ? "none" : "block";
+  }
+}
 </script>
 </body>
 </html>
