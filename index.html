@@ -515,13 +515,15 @@ function renderTagPanel(){
 }
 
 /* NEW NOTE */
-newPage.onclick=()=>{
-  let id=Date.now()
-  let note={id:id,title:"Untitled Note",content:"",created:id,updated:id,pinned:false}
-  notes.unshift(note)
-  save()
-  openNote(id)
-}
+newPage.onclick = () => {
+  let id = Date.now();
+  let note = { id: id, title: "Untitled Note", content: "", created: id, updated: id, pinned: false };
+  notes.unshift(note);
+  save();
+  
+  // Open new note in edit mode (so Enter moves to content)
+  openNote(id, true);
+};
 
 /* META PANELS */
 function renderMeta(note){
@@ -646,24 +648,32 @@ importFile.onchange=e=>{
 }
 
 /* OPEN NOTE */
-function openNote(id){
-  current=id
-  let note=notes.find(n=>n.id===id)
+/* OPEN NOTE */
+function openNote(id, isNew = false) {  // added isNew flag
+  current = id;
+  let note = notes.find(n => n.id === id);
 
-  title.value=note.title
-  content.value=note.content
+  title.value = note.title;
+  content.value = note.content;
 
-  renderMeta(note)
-  setMode("preview")
-  renderPages()
+  renderMeta(note);
+  renderPages();
 
-  // focus title when opening note
-  setTimeout(()=>{
-  title.focus()
-  title.select()
-},0)
+  // Focus title
+  setTimeout(() => {
+    title.focus();
+    title.select();
+  }, 0);
+
+  // Set mode:
+  // - New note -> edit mode
+  // - Existing note -> preview mode
+  if (isNew) {
+    setMode("edit");
+  } else {
+    setMode("preview");
+  }
 }
-
 /* INIT NOTES */
 if(notes.length===0){
   let id=Date.now()
