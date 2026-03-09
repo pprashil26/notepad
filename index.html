@@ -539,6 +539,18 @@ stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerTex
     setMode("preview")  
     renderPages()
 }
+  // INIT TODO
+todoContent.value = localStorage.getItem("globalTodo") || ""
+// Force preview mode on load
+setTodoMode("preview")
+
+// Auto-update preview when editing
+todoContent.oninput = ()=>{
+  saveTodo()
+  if(todoMode==="preview"){
+    todoPreview.innerHTML = marked.parse(todoContent.value)
+  }
+}
 </script>
 </body>
 </html>
