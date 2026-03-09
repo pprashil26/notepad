@@ -165,6 +165,7 @@ body{
 }
 #content{
   flex:1;
+  min-height:0;
   border:none;
   padding:10px 14px 16px 14px;
   font-family:monospace;
@@ -173,20 +174,37 @@ body{
   outline:none;
   resize:none;
   background:white;
-}
-#preview{
-  flex:1;
-  padding:12px 16px;
-  font-size:15px;
-  line-height:1.6;
+  overflow-y:auto;
+
+  max-width:900px;
+  margin:auto;
+  width:100%;
 }
 
+#preview{
+  flex:1;
+  min-height:0;
+  padding:20px 24px;
+  font-size:15px;
+  line-height:1.6;
+  overflow-y:auto;
+
+  max-width:900px;
+  margin:auto;
+  width:100%;
+}
+
+}
 /* META PANELS */
 #tags,#stats,#backlinks{
   padding:4px 8px;
   font-size:11px;
   border-top:1px solid #eee;
   color:#555;
+}
+#content,
+#preview{
+  scroll-behavior:smooth;
 }
 
 /* MARKDOWN */
