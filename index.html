@@ -390,6 +390,7 @@ body{
 <div id="paletteList"></div>
 </div>
 <div id="linkSuggest"></div>
+<div id="hoverPreview"></div>
 <script>
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
@@ -497,7 +498,27 @@ function togglePin(){let n=notes.find(x=>x.id===current);n.pinned=!n.pinned;save
 function deleteNote(){if(!confirm("Delete note?")) return;notes=notes.filter(n=>n.id!==current);save();if(notes.length) openNote(notes[0].id);renderPages()}
 
 /* MARKDOWN */
-return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
+function renderPreview(){
+
+  let html = marked.parse(content.value)
+
+  html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
+
+let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
+
+    if(!note){
+      let id = Date.now()
+      note = {id:id,title:name,content:"",created:id,updated:id,pinned:false}
+      notes.push(note)
+      save()
+    }
+
+    return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
+
+  })
+
+  preview.innerHTML = html
+}
 
 /* MODE */
 function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.style.display="none"}else{renderPreview();content.style.display="none";preview.style.display="block"}}
@@ -648,10 +669,8 @@ let rect = content.getBoundingClientRect()
 let lineHeight = 18
 let lines = content.value.substr(0, content.selectionStart).split("\n").length
 
-<div id="hoverPreview"></div>
-
-linkSuggest.style.left = rect.left + 20 + "px"
-linkSuggest.style.top = rect.top + (lines * lineHeight) + 40 + "px"
+linkSuggest.style.left = rect.left + 10 + "px"
+linkSuggest.style.top = rect.top + (lines * lineHeight) + 20 + "px"
 linkSuggest.style.display="block"
 
   } else {
@@ -660,24 +679,32 @@ linkSuggest.style.display="block"
 
 })
 const hoverPreview = document.getElementById("hoverPreview")
+let hoverTimer = null
 
 preview.addEventListener("mouseover", function(e){
 
   if(e.target.classList.contains("noteLink")){
 
-    let id = Number(e.target.dataset.id)
-    let note = notes.find(n=>n.id===id)
+    clearTimeout(hoverTimer)
 
-    if(!note) return
+    hoverTimer = setTimeout(()=>{
 
-    let rect = e.target.getBoundingClientRect()
+      let id = Number(e.target.dataset.id)
+      let note = notes.find(n=>n.id===id)
 
-    hoverPreview.style.left = rect.right + 10 + "px"
-    hoverPreview.style.top = rect.top + "px"
+      if(!note) return
 
-    hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
+      let rect = e.target.getBoundingClientRect()
 
-    hoverPreview.style.display="block"
+      hoverPreview.style.left = rect.right + 10 + "px"
+      hoverPreview.style.top = rect.top + "px"
+
+      hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
+
+      hoverPreview.style.display="block"
+
+    },150)
+
   }
 
 })
@@ -685,6 +712,7 @@ preview.addEventListener("mouseover", function(e){
 preview.addEventListener("mouseout", function(e){
 
   if(e.target.classList.contains("noteLink")){
+    clearTimeout(hoverTimer)
     hoverPreview.style.display="none"
   }
 
