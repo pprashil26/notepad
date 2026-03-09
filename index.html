@@ -194,13 +194,17 @@ body{
   width:100%;
 }
 
-}
 /* META PANELS */
 #tags,#stats,#backlinks{
   padding:4px 8px;
   font-size:11px;
   border-top:1px solid #eee;
   color:#555;
+  opacity:0.8;
+
+  max-width:900px;
+  margin:auto;
+  width:100%;
 }
 #content,
 #preview{
@@ -544,6 +548,12 @@ function renderMeta(note){
 
 /* TITLE & CONTENT */
 title.oninput=e=>{let n=notes.find(x=>x.id===current); n.title=e.target.value; n.updated=Date.now(); save(); renderPages()}
+title.addEventListener("keydown",function(e){
+  if(e.key==="Enter"){
+    e.preventDefault();
+    content.focus();
+  }
+});
 content.oninput=e=>{let n=notes.find(x=>x.id===current); n.content=e.target.value; n.updated=Date.now(); save(); renderMeta(n); if(mode==="preview") renderPreview()}
 
 /* PIN / DELETE */
@@ -639,11 +649,19 @@ importFile.onchange=e=>{
 function openNote(id){
   current=id
   let note=notes.find(n=>n.id===id)
+
   title.value=note.title
   content.value=note.content
+
   renderMeta(note)
   setMode("preview")
   renderPages()
+
+  // focus title when opening note
+  setTimeout(()=>{
+  title.focus()
+  title.select()
+},0)
 }
 
 /* INIT NOTES */
