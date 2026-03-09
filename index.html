@@ -8,171 +8,155 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
-
 body{
-font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
-margin:0;
-background:#f5f6f8;
-height:100vh;
-display:flex;
-flex-direction:column;
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
+  margin:0;
+  background:#f5f6f8;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
 /* TOP BAR */
 #topbar{
-background:white;
-padding:6px;
-display:flex;
-gap:6px;
-box-shadow:0 2px 6px rgba(0,0,0,0.05);
+  background:white;
+  padding:6px;
+  display:flex;
+  gap:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
-
 #search{
-flex:1;
-padding:6px;
-border-radius:6px;
-border:1px solid #ddd;
-font-size:13px;
+  flex:1;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ddd;
+  font-size:13px;
 }
-
 .topbtn{
-padding:4px 8px;
-border:1px solid #ccc;
-background:white;
-border-radius:6px;
-cursor:pointer;
-font-size:12px;
+  padding:4px 8px;
+  border:1px solid #ccc;
+  background:white;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:12px;
 }
 
 /* LAYOUT */
 #container{
-flex:1;
-display:flex;
-overflow:hidden;
+  flex:1;
+  display:flex;
+  overflow:hidden;
 }
 
 /* SIDEBAR */
 #sidebar{
-width:180px; /* compact width */
-background:white;
-border-right:1px solid #eee;
-display:flex;
-flex-direction:column;
+  width:160px; /* very compact */
+  background:white;
+  border-right:1px solid #eee;
+  display:flex;
+  flex-direction:column;
 }
-
 #newPage{
-margin:6px;
-padding:6px;
-border:none;
-border-radius:4px;
-background:#2f7ef7;
-color:white;
-cursor:pointer;
-font-size:12px;
+  margin:4px;
+  padding:4px;
+  border:none;
+  border-radius:4px;
+  background:#2f7ef7;
+  color:white;
+  cursor:pointer;
+  font-size:11px;
 }
-
 #pages{
-flex:1;
-overflow:auto;
+  flex:1;
+  overflow:auto;
 }
-
 .page{
-padding:6px 8px;
-cursor:pointer;
-border-bottom:1px solid #f1f1f1;
-font-size:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-white-space:nowrap;
+  padding:3px 5px;
+  cursor:pointer;
+  border-bottom:1px solid #f1f1f1;
+  font-size:11px;      /* compact title */
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  white-space:nowrap;
 }
-
 .page:hover{
-background:#f5f6f8;
+  background:#f5f6f8;
 }
-
 .active{
-background:#e8f0ff;
+  background:#e8f0ff;
 }
-
 .pin{
-font-size:11px;
-color:#999;
-margin-left:4px;
+  font-size:10px;       /* compact pin */
+  color:#999;
+  margin-left:4px;
 }
-
 .dateLabel{
-font-size:10px;
-color:#999;
-margin-left:4px;
+  font-size:9px;        /* ultra-compact date */
+  color:#999;
+  margin-left:4px;
 }
 
 /* EDITOR */
 #editorCard{
-flex:1;
-margin:10px;
-background:white;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.06);
-display:flex;
-flex-direction:column;
-overflow:hidden;
+  flex:1;
+  margin:10px;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
-
 #title{
-border:none;
-border-bottom:1px solid #eee;
-padding:10px;
-font-size:15px;
-font-weight:600;
-outline:none;
+  border:none;
+  border-bottom:1px solid #eee;
+  padding:10px;
+  font-size:15px;
+  font-weight:600;
+  outline:none;
 }
-
 #mode{
-padding:6px 10px;
-border-bottom:1px solid #eee;
-display:flex;
-gap:4px;
-font-size:12px;
+  padding:6px 10px;
+  border-bottom:1px solid #eee;
+  display:flex;
+  gap:4px;
+  font-size:12px;
 }
-
 #mode button{
-padding:3px 6px;
-border:1px solid #ccc;
-background:white;
-border-radius:4px;
-cursor:pointer;
+  padding:3px 6px;
+  border:1px solid #ccc;
+  background:white;
+  border-radius:4px;
+  cursor:pointer;
 }
-
 #deleteBtn{
-margin-left:auto;
-background:#ffebeb;
-border:1px solid #ffbaba;
+  margin-left:auto;
+  background:#ffebeb;
+  border:1px solid #ffbaba;
 }
-
 #content{
-flex:1;
-border:none;
-padding:10px;
-font-family:monospace;
-font-size:13px;
-outline:none;
-resize:none;
+  flex:1;
+  border:none;
+  padding:10px;
+  font-family:monospace;
+  font-size:13px;
+  outline:none;
+  resize:none;
 }
-
 #preview{
-flex:1;
-padding:10px;
-overflow:auto;
-display:none;
+  flex:1;
+  padding:10px;
+  overflow:auto;
+  display:none;
 }
 
 /* META PANELS */
 #tags,#stats,#backlinks{
-padding:4px 8px;
-font-size:11px;
-border-top:1px solid #eee;
-color:#555;
+  padding:4px 8px;
+  font-size:11px;
+  border-top:1px solid #eee;
+  color:#555;
 }
 
 /* MARKDOWN */
@@ -184,106 +168,71 @@ color:#555;
 
 /* COMMAND PALETTE */
 #palette{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-width:320px;
-border-radius:8px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-display:none;
-flex-direction:column;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:white;
+  width:320px;
+  border-radius:8px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  display:none;
+  flex-direction:column;
 }
-
 #palette input{
-border:none;
-border-bottom:1px solid #eee;
-padding:10px;
-outline:none;
+  border:none;
+  border-bottom:1px solid #eee;
+  padding:10px;
+  outline:none;
 }
-
 .paletteItem{
-padding:8px;
-cursor:pointer;
+  padding:8px;
+  cursor:pointer;
 }
-
 .paletteItem:hover{
-background:#f5f6f8;
+  background:#f5f6f8;
 }
 
 /* MOBILE OPTIMIZATIONS */
 @media(max-width:700px){
-#container{
-flex-direction:column;
-}
-#sidebar{
-width:100%;
-height:auto;
-max-height:140px;
-display:flex;
-overflow-x:auto;
-border-right:none;
-border-bottom:1px solid #eee;
-}
-#pages{
-display:flex;
-gap:4px;
-flex-wrap:nowrap;
-}
-.page{
-flex:0 0 auto;
-border-bottom:none;
-border-right:1px solid #eee;
-padding:4px 6px;
-font-size:11px;
-}
-#editorCard{
-margin:5px;
-}
-#title{
-font-size:14px;
-padding:8px;
-}
-#content,#preview{
-font-size:13px;
-padding:6px;
-}
-#mode button{
-padding:3px 5px;
-font-size:11px;
-}
-#tags,#stats,#backlinks{
-font-size:10px;
-padding:3px 6px;
-}
-#preview{
-min-height:180px;
-}
+  #container{flex-direction:column;}
+  #sidebar{
+    width:100%;
+    height:auto;
+    max-height:140px;
+    display:flex;
+    overflow-x:auto;
+    border-right:none;
+    border-bottom:1px solid #eee;
+  }
+  #pages{
+    display:flex;
+    gap:4px;
+    flex-wrap:nowrap;
+  }
+  .page{
+    flex:0 0 auto;
+    border-bottom:none;
+    border-right:1px solid #eee;
+    padding:2px 4px;
+    font-size:10px;
+  }
+  #editorCard{margin:5px;}
+  #title{font-size:14px;padding:8px;}
+  #content,#preview{font-size:13px;padding:6px;}
+  #mode button{padding:3px 5px;font-size:11px;}
+  #tags,#stats,#backlinks{font-size:10px;padding:3px 6px;}
+  #preview{min-height:180px;}
 }
 @media(max-width:400px){
-#topbar{
-flex-direction:column;
-gap:4px;
-padding:4px;
+  #topbar{flex-direction:column;gap:4px;padding:4px;}
+  #search{width:100%;font-size:12px;padding:4px;}
+  .topbtn{width:100%;font-size:11px;padding:4px 6px;}
 }
-#search{
-width:100%;
-font-size:12px;
-padding:4px;
-}
-.topbtn{
-width:100%;
-font-size:11px;
-padding:4px 6px;
-}
-}
-
 </style>
 </head>
 
 <body>
-
 <div id="topbar">
 <input id="search" placeholder="Search notes (Ctrl + /)">
 <button class="topbtn" onclick="exportNotes()">Export</button>
@@ -292,7 +241,6 @@ padding:4px 6px;
 </div>
 
 <div id="container">
-
 <div id="sidebar">
 <button id="newPage">+ New Page</button>
 <div id="pages"></div>
@@ -312,7 +260,6 @@ padding:4px 6px;
 <div id="stats"></div>
 <div id="backlinks"></div>
 </div>
-
 </div>
 
 <div id="palette">
@@ -321,7 +268,6 @@ padding:4px 6px;
 </div>
 
 <script>
-
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode="edit"
@@ -346,7 +292,10 @@ function renderPages(filter=""){
             let div=document.createElement("div")
             div.className="page"+(n.id===current?" active":"")
             let t=document.createElement("span");t.textContent=n.title
-            let date=document.createElement("span");date.textContent=new Date(n.created).toLocaleDateString();date.className="dateLabel"
+            let date=document.createElement("span")
+            let d=new Date(n.created)
+            date.textContent=`${d.getDate()}/${d.getMonth()+1}` // DD/MM format
+            date.className="dateLabel"
             let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"📌":""
             div.appendChild(t);div.appendChild(date);div.appendChild(p)
             div.onclick=()=>openNote(n.id)
@@ -419,7 +368,6 @@ paletteSearch.oninput=e=>{renderPalette(e.target.value.toLowerCase())}
 if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
 openNote(notes[0].id)
 renderPages()
-
 </script>
 
 </body>
