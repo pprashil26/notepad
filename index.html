@@ -102,12 +102,16 @@ body{
 #editorCard{
   flex:1;
   margin:10px;
-  background:#dffcf0; /* Updated background color */
+  background:#dffcf0; /* Main editor background */
   border-radius:10px;
   box-shadow:0 3px 10px rgba(0,0,0,0.06);
   display:flex;
   flex-direction:column;
   overflow:hidden;
+
+  /* Dot grid effect */
+  background-image: radial-gradient(#b0e5c3 1px, transparent 1px);
+  background-size: 20px 20px; /* spacing between dots */
 }
 #title{
   border:none;
