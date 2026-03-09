@@ -361,6 +361,15 @@ body{
   color:white;
   border-color:#1c5fd1;
 }
+table{
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #ccc;
+padding:6px;
+text-align:center;
+}
 </style>
 </head>
 
@@ -690,6 +699,10 @@ preview.addEventListener("mouseover", function(e){
   }
 })
 preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
+marked.setOptions({
+  gfm: true,
+  breaks: true
+});
 </script>
 </body>
 </html>
