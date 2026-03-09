@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markdown Knowledge Notepad with Redesigned Todo Sidebar</title>
+<title>Markdown Knowledge Notepad with Bottom New Page</title>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -56,16 +56,6 @@ body{
   display:flex;
   flex-direction:column;
 }
-#newPage{
-  margin:4px;
-  padding:4px;
-  border:none;
-  border-radius:4px;
-  background:#2f7ef7;
-  color:white;
-  cursor:pointer;
-  font-size:11px;
-}
 #pages{
   flex:1;
   overflow:auto;
@@ -95,6 +85,17 @@ body{
   font-size:9px;
   color:#999;
   margin-left:4px;
+}
+#newPage{
+  margin:4px;
+  padding:4px;
+  border:none;
+  border-radius:4px;
+  background:#2f7ef7;
+  color:white;
+  cursor:pointer;
+  font-size:11px;
+  align-self:stretch;
 }
 
 /* MAIN EDITOR */
@@ -285,8 +286,8 @@ body{
 <div id="container">
   <!-- LEFT SIDEBAR -->
   <div id="sidebar">
-    <button id="newPage">+ New Page</button>
     <div id="pages"></div>
+    <button id="newPage">+ New Page</button>
   </div>
 
   <!-- MAIN EDITOR -->
@@ -305,7 +306,7 @@ body{
     <div id="backlinks"></div>
   </div>
 
-  <!-- RIGHT MARKDOWN TODO SIDEBAR -->
+  <!-- RIGHT TODO SIDEBAR -->
   <div id="todoSidebar">
     <div id="todoHeader">
       <span>Todo List</span>
@@ -329,9 +330,12 @@ body{
 </div>
 
 <script>
+// --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode="edit"
+
+// --- TODO ---
 let todoVisible = true
 let todoMode = "edit"
 
@@ -432,7 +436,14 @@ function setMode(m){mode=m;if(m==="edit"){content.style.display="block";preview.
 function setTodoMode(m){
   todoMode = m
   if(m==="edit"){todoContent.style.display="block";todoPreview.style.display="none"}
-  else{todoPreview.innerHTML=marked.parse(todoContent.value);todoContent.style.display="none";todoPreview.style.display="block"}
+  else{todoPreview.innerHTML=todoContent.value;todoContent.style.display="none";todoPreview.style.display="block"}
+}
+
+/* TOGGLE TODO */
+function toggleTodo(){
+    todoVisible=!todoVisible
+    todoSidebar.style.display = todoVisible ? "flex" : "none"
+    showTodoBtn.style.display = todoVisible ? "none" : "block"
 }
 
 /* SEARCH */
@@ -442,25 +453,13 @@ search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
 function exportNotes(){let blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="notes_export.json";a.click()}
 importFile.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=function(evt){notes=JSON.parse(evt.target.result);save();openNote(notes[0].id);renderPages()};r.readAsText(f)}
 
-/* COMMAND PALETTE */
-document.addEventListener("keydown",e=>{
-    if(e.ctrlKey && e.key==="/"){e.preventDefault();search.focus()}
-    if(e.ctrlKey && e.key==="k"){e.preventDefault();palette.style.display="flex";paletteSearch.focus();renderPalette()}})
-function renderPalette(filter=""){paletteList.innerHTML="";notes.filter(n=>n.title.toLowerCase().includes(filter)).forEach(n=>{let d=document.createElement("div");d.className="paletteItem";d.textContent=n.title;d.onclick=()=>{openNote(n.id);palette.style.display="none"};paletteList.appendChild(d)})}
-paletteSearch.oninput=e=>{renderPalette(e.target.value.toLowerCase())}
-
 /* INIT */
 if(notes.length===0){let id=Date.now();notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false});save()}
 openNote(notes[0].id)
 
-/* TODO SIDEBAR */
+/* INIT TODO */
 todoContent.value = localStorage.getItem("globalTodo") || ""
 todoContent.oninput = saveTodo
-function toggleTodo(){
-    todoVisible=!todoVisible
-    todoSidebar.style.display = todoVisible ? "flex" : "none"
-    showTodoBtn.style.display = todoVisible ? "none" : "block"
-}
 </script>
 </body>
 </html>
