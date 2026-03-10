@@ -117,19 +117,21 @@ body {
 /* EDITOR CARD */
 #editorCard {
   flex: 1;
-  margin: 12px;
-  display: flex;
-  flex-direction: column;
+  max-width: 600px;            /* notebook width ~A5 */
+  width: 100%;
+  margin: 20px auto;           /* center horizontally with vertical spacing */
   border-radius: 12px;
   border: 1px solid #e6e6e6;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   transition: all 0.2s;
 }
 #editorCard:focus-within {
   border-color: #2f7ef7;
-  box-shadow: 0 4px 16px rgba(47,126,247,0.15);
+  box-shadow: 0 6px 20px rgba(47,126,247,0.15);
 }
 
 /* MODE BUTTONS */
@@ -159,26 +161,36 @@ body {
   font-weight: 600;
   border: none;
   outline: none;
-  padding: 14px 16px 6px 16px;
+  padding: 16px 20px 8px 20px;
   background: #fff;
   width: 100%;
+  text-align: left;
 }
+
 #content {
   flex: 1;
   border: none;
   outline: none;
-  padding: 16px 20px;
+  padding: 24px 20px;           /* comfortable writing space */
   font-family: "Consolas", "Courier New", monospace;
   font-size: 15px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 900px;
+  max-width: 560px;             /* slightly smaller than card width */
   width: 100%;
-  margin: auto;
+  margin: auto;                 /* center text area */
   word-wrap: break-word;
-  background: #fff;
+  background: repeating-linear-gradient(   /* optional notebook lines */
+    to bottom,
+    #fff,
+    #fff 28px,
+    #f9f9f9 28px,
+    #f9f9f9 29px
+  );
   resize: none;
 }
+
+/* PREVIEW */
 #preview {
   flex: 1;
   display: none;
@@ -186,9 +198,9 @@ body {
   font-size: 16px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 900px;
+  max-width: 560px;             /* match content width */
   width: 100%;
-  margin: auto;
+  margin: auto;                 /* center preview */
   background: #fcfdff;
   border-radius: 8px;
 }
@@ -244,6 +256,14 @@ body.focusMode #editorCard {
 /* TABLES */
 table { border-collapse: collapse; }
 td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
+
+body.focusMode #editorCard {
+  max-width: 600px;
+  width: 100%;
+  margin: 40px auto;             /* vertical spacing for notebook look */
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
 
 </style>
 </head>
