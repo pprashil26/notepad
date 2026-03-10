@@ -439,6 +439,18 @@ body.focusMode #editorCard {
   font-weight: 600;
   border-radius: 6px;
 }
+#mode span button {
+  padding:2px 6px;
+  font-size:12px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  cursor:pointer;
+  background:white;
+}
+#mode span button:hover{
+  background:#e8f0ff;
+  border-color:#2f7ef7;
+}
 </style>
 </head>
 
@@ -461,12 +473,23 @@ body.focusMode #editorCard {
   <!-- MAIN EDITOR -->
   <div id="editorCard">
     <div id="mode">
-      <button onclick="setMode('edit')">Edit</button>
-      <button onclick="setMode('preview')">Preview</button>
-      <button onclick="togglePin()">Pin</button>
-	  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
-      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-    </div>
+  <!-- Mode buttons -->
+  <button onclick="setMode('edit')">Edit</button>
+  <button onclick="setMode('preview')">Preview</button>
+  <button onclick="togglePin()">Pin</button>
+  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
+  <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+
+  <!-- Compact Markdown Toolbar -->
+<!-- Compact Markdown Toolbar -->
+<span style="margin-left:8px;display:flex;gap:4px;">
+  <button onclick="wrapSelectionActive('**','**')" title="Bold (Ctrl+B)"><b>B</b></button>
+  <button onclick="wrapSelectionActive('_','_')" title="Italic (Ctrl+I)"><i>I</i></button>
+  <button onclick="toggleCapsActive()" title="Caps Lock (Ctrl+Shift+C)">Aa</button>
+  <button onclick="wrapSelectionActive('[', '](url)')" title="Link (Ctrl+K)">🔗</button>
+  <button onclick="wrapSelectionActive('==','==')" title="Highlight (Ctrl+H)">💛</button>
+</span>
+</div>
     <input id="title" placeholder="Title">
     <textarea id="content"></textarea>
     <div id="preview"></div>
@@ -964,6 +987,107 @@ function insertMarkdownTimestamp(el) {
         el.dispatchEvent(new Event('input'));
     }
 }
+<!-- Compact Markdown Toolbar -->
+// Wrap selected text in any editor
+function wrapSelectionActive(before, after){
+  const active = document.activeElement;
+  if(active === content || active === stickyNote || active === todoContent){
+    const el = active;
+    if(el.tagName === "TEXTAREA"){
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const sel = el.value.substring(start,end);
+      el.value = el.value.substring(0,start) + before + sel + after + el.value.substring(end);
+      el.selectionStart = start + before.length;
+      el.selectionEnd = end + before.length;
+      el.focus();
+      el.dispatchEvent(new Event('input'));
+    } else if(el.isContentEditable){
+      const sel = window.getSelection();
+      if(!sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      const textNode = document.createTextNode(before + range.toString() + after);
+      range.deleteContents();
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      el.dispatchEvent(new Event('input'));
+    }
+  }
+}
+
+// Caps toggle for selected text
+function toggleCapsActive(){
+  const active = document.activeElement;
+  if(active === content || active === stickyNote || active === todoContent){
+    const el = active;
+    if(el.tagName === "TEXTAREA"){
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const sel = el.value.substring(start,end);
+      if(!sel) return;
+      const transformed = sel === sel.toUpperCase() ? sel.toLowerCase() : sel.toUpperCase();
+      el.value = el.value.substring(0,start) + transformed + el.value.substring(end);
+      el.selectionStart = start;
+      el.selectionEnd = start + transformed.length;
+      el.focus();
+      el.dispatchEvent(new Event('input'));
+    } else if(el.isContentEditable){
+      const sel = window.getSelection();
+      if(!sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      const text = range.toString();
+      if(!text) return;
+      const transformed = text === text.toUpperCase() ? text.toLowerCase() : text.toUpperCase();
+      const textNode = document.createTextNode(transformed);
+      range.deleteContents();
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      el.dispatchEvent(new Event('input'));
+    }
+  }
+}
+
+// Keyboard shortcuts for Markdown toolbar
+document.addEventListener("keydown", function(e){
+  const active = document.activeElement;
+  if(!(active === content || active === stickyNote || active === todoContent)) return;
+
+  // Ctrl+B → Bold
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "b"){
+    e.preventDefault();
+    wrapSelectionActive("**","**");
+  }
+
+  // Ctrl+I → Italic
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "i"){
+    e.preventDefault();
+    wrapSelectionActive("_","_");
+  }
+
+  // Ctrl+Shift+C → Caps toggle
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c"){
+    e.preventDefault();
+    toggleCapsActive();
+  }
+
+  // Ctrl+K → Link
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "k"){
+    e.preventDefault();
+    wrapSelectionActive("[", "](url)");
+  }
+
+  // Ctrl+H → Highlight
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "h"){
+    e.preventDefault();
+    wrapSelectionActive("==","==");
+  }
+});
 
 </script>
 </body>
