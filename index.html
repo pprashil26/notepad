@@ -587,10 +587,20 @@ function renderMeta(note){
 
 /* TITLE & CONTENT */
 title.oninput=e=>{let n=notes.find(x=>x.id===current); n.title=e.target.value; n.updated=Date.now(); save(); renderPages()}
-title.addEventListener("keydown",function(e){
-  if(e.key==="Enter"){
+title.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
     e.preventDefault();
-    content.focus();
+
+    // If this is a new note (content is empty), select content start
+    if (notes.find(n => n.id === current).content === "") {
+      content.value = "";       // ensure empty
+      content.focus();
+      content.selectionStart = 0;
+      content.selectionEnd = 0;
+    } else {
+      // Otherwise just focus without altering existing content
+      content.focus();
+    }
   }
 });
 content.oninput=e=>{let n=notes.find(x=>x.id===current); n.content=e.target.value; n.updated=Date.now(); save(); renderMeta(n); if(mode==="preview") renderPreview()}
@@ -696,11 +706,12 @@ function openNote(id, isNew = false) {  // added isNew flag
   renderMeta(note);
   renderPages();
 
-  // Focus title
+// Focus title only for new notes
+if (isNew) {
   setTimeout(() => {
-    title.focus();
-    title.select();
+    title.focus();  // focus without selecting text
   }, 0);
+}
 
   // Set mode:
   // - New note -> edit mode
@@ -794,8 +805,10 @@ marked.setOptions({
   gfm: true,
   breaks: true
 });
-let focusMode = false;
 
+
+// --- FOCUS MODE ---
+const focusBtn = document.getElementById("focusBtn");
 let focusMode = false;
 let prevMode = mode;         // store previous edit/preview mode
 let prevTodoVisible = todoVisible;
