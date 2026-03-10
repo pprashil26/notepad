@@ -499,12 +499,16 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
+<script>
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
-let mode="preview"
+let mode = "preview"
 let todoVisible = true
 let todoMode = "edit"
+
+// Keep track of highlighted tags
+let tagHighlight = JSON.parse(localStorage.getItem("tagHighlight") || "{}");
 
 // SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
@@ -517,14 +521,24 @@ function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.r
 // RENDER PAGES & TAGS
 function renderPages(filter=""){
   let pinned=[],others=[]
-  notes.forEach(n=>{
+  const activeTags = Object.keys(tagHighlight).filter(t => tagHighlight[t])
+
+  notes.forEach(n => {
+    // Text search filter
     if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
+    
+    // Tag filter: show only notes containing all active highlighted tags
+    const noteTags = getTags(n.content)
+    if(activeTags.length && !activeTags.every(t => noteTags.includes(t))) return
+
     if(n.pinned) pinned.push(n)
     else others.push(n)
   })
+
   pinned.sort((a,b)=>b.created-a.created)
   others.sort((a,b)=>b.created-a.created)
   pages.innerHTML=""
+  
   function renderList(list){
     list.forEach(n=>{
       let div=document.createElement("div")
@@ -557,15 +571,14 @@ function renderTagPanel(){
     div.className = "tagItem"
     div.textContent = tag
 
-    // Set background if highlighted
+    // Highlight if toggled
     div.style.backgroundColor = tagHighlight[tag] ? "#fff9c4" : "#f0f0f0"
 
-    // Toggle highlight on click
+    // Toggle highlight
     div.onclick = () => {
       tagHighlight[tag] = !tagHighlight[tag]
-      renderTagPanel() // re-render to apply color
-      search.value = tag
-      renderPages(tag)
+      localStorage.setItem("tagHighlight", JSON.stringify(tagHighlight))
+      renderPages() // Re-render pages to filter notes based on highlighted tags
     }
 
     tagPanel.appendChild(div)
