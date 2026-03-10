@@ -441,7 +441,7 @@ body.focusMode #editorCard {
 }
 .timestamp {
   color: #999; /* subtle gray */
-  font-size: 13px;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -689,13 +689,25 @@ function deleteNote(){if(!confirm("Delete note?")) return; notes=notes.filter(n=
 
 /* MARKDOWN */
 function renderPreview(){
-  let html = marked.parse(content.value)
-  html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-    let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
-    if(!note){let id = Date.now(); note = {id:id,title:name,content:"",created:id,updated:id,pinned:false}; notes.push(note); save()}
-    return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-  })
-  preview.innerHTML = html
+    let html = marked.parse(content.value);
+    
+    // Wrap timestamps in subtle gray
+    html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,
+        '<span class="timestamp">[$1]</span>'
+    );
+
+    // Keep your existing note-link replacement
+    html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
+        let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
+        if(!note){
+            let id = Date.now();
+            note = {id:id,title:name,content:"",created:id,updated:id,pinned:false};
+            notes.push(note); save()
+        }
+        return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
+    });
+
+    preview.innerHTML = html;
 }
 
 /* MODE */
@@ -938,7 +950,7 @@ function insertMarkdownTimestamp(el) {
     const now = new Date();
     const pad = n => n.toString().padStart(2,"0");
 
-    const timestampText = `[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
+    const tsText = `[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
 
     if (el.tagName === "TEXTAREA") {
         const start = el.selectionStart;
@@ -946,9 +958,8 @@ function insertMarkdownTimestamp(el) {
         const textBefore = el.value.substring(0, start);
         const textAfter = el.value.substring(end);
 
-        // For textarea, just insert as plain text (Markdown)
-        el.value = textBefore + timestampText + textAfter;
-        const cursorPos = start + timestampText.length;
+        el.value = textBefore + tsText + textAfter;
+        const cursorPos = start + tsText.length;
         el.selectionStart = el.selectionEnd = cursorPos;
 
         el.dispatchEvent(new Event('input'));
@@ -958,22 +969,20 @@ function insertMarkdownTimestamp(el) {
         const range = sel.getRangeAt(0);
         range.deleteContents();
 
-        // Create a span with subtle timestamp
+        // Insert span with subtle color
         const span = document.createElement("span");
         span.className = "timestamp";
-        span.textContent = timestampText;
+        span.textContent = tsText;
 
         range.insertNode(span);
-
-        // Move cursor after timestamp
         range.setStartAfter(span);
         range.setEndAfter(span);
+
         sel.removeAllRanges();
         sel.addRange(range);
 
         el.dispatchEvent(new Event('input'));
     }
-}
-</script>
+}</script>
 </body>
 </html>
