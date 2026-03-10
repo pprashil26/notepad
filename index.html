@@ -547,15 +547,10 @@ const activeTags = Object.keys(tagHighlight).filter(
     
     // Tag filter
     const noteTags = getTags(n.content)
-    if(activeTags.length){
-      if(activeTags.length <= 2){
-        // Require all tags
-        if(!activeTags.every(t => noteTags.includes(t))) return
-      } else {
-        // More than 2 tags → at least one
-        if(!activeTags.some(t => noteTags.includes(t))) return
-      }
-    }
+    // Multi-tag filter (OR logic)
+if(activeTags.length){
+  if(!activeTags.some(t => noteTags.includes(t))) return
+}
 
     if(n.pinned) pinned.push(n)
     else others.push(n)
@@ -587,44 +582,50 @@ const activeTags = Object.keys(tagHighlight).filter(
 
 // --- RENDER TAG PANEL ---
 function renderTagPanel(){
-  let allTags = []
-  notes.forEach(n => allTags.push(...getTags(n.content)))
-  allTags = [...new Set(allTags)]
 
-  // Separate pinned vs normal tags
-  let pinnedList = allTags.filter(t => pinnedTags[t])
-  let normalList = allTags.filter(t => !pinnedTags[t])
+  const tagCount = {}
+
+  // Count tags
+  notes.forEach(n=>{
+    getTags(n.content).forEach(t=>{
+      tagCount[t] = (tagCount[t] || 0) + 1
+    })
+  })
+
+  const allTags = Object.keys(tagCount)
+
+  // Separate pinned vs normal
+  const pinnedList = allTags.filter(t => pinnedTags[t])
+  const normalList = allTags.filter(t => !pinnedTags[t])
 
   tagPanel.innerHTML = ""
 
   function renderTags(list){
     list.forEach(tag => {
+
       let div = document.createElement("div")
       div.className = "tagItem"
-      div.textContent = tag
 
-      // Highlight if toggled
+      // Show tag + count
+      div.textContent = `${tag} (${tagCount[tag]})`
+
       if(tagHighlight[tag]) div.style.backgroundColor = "#fff9c4"
 
-      // Pinned style
       if(pinnedTags[tag]){
         div.classList.add("pinned")
-        div.textContent = "⭐ " + tag
-        if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082" // slightly darker if highlighted
+        div.textContent = `⭐ ${tag} (${tagCount[tag]})`
+        if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082"
       }
 
-      // Click: highlight / pin
-      div.onclick = (e) => {
+      div.onclick = (e)=>{
         if(e.ctrlKey){
-          // Ctrl+Click = toggle pin
           pinnedTags[tag] = !pinnedTags[tag]
-          localStorage.setItem("pinnedTags", JSON.stringify(pinnedTags))
-        } else {
-          // Normal click = toggle highlight
+          localStorage.setItem("pinnedTags",JSON.stringify(pinnedTags))
+        }else{
           tagHighlight[tag] = !tagHighlight[tag]
-          localStorage.setItem("tagHighlight", JSON.stringify(tagHighlight))
+          localStorage.setItem("tagHighlight",JSON.stringify(tagHighlight))
         }
-        renderPages() // refresh pages and tags
+        renderPages()
       }
 
       tagPanel.appendChild(div)
