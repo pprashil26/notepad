@@ -3,326 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad v2.0</title>
+<title>Notepad v2.3 Ultra Minimal</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
-body{
-  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
-  margin:0;
-  background:#f5f6f8;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+/* GLOBAL STYLING */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fefefe;
+  color: #111;
 }
 
-/* TOP BAR */
-#topbar{
-  background:white;
-  padding:6px;
-  display:flex;
-  gap:6px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+/* TOPBAR */
+#topbar {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  gap: 6px;
 }
-#search{
-  flex:1;
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ddd;
-  font-size:13px;
+#search {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
-.topbtn{
-  padding:4px 8px;
-  border:1px solid #ccc;
-  background:white;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
+.topbtn {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.topbtn:hover {
+  background: #f0f4ff;
+  border-color: #2f7ef7;
 }
 
-/* LAYOUT */
-#container{
-  flex:1;
-  display:flex;
-  overflow:hidden;
+/* MAIN LAYOUT */
+#container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
-/* LEFT SIDEBAR */
-#sidebar{
-  width:160px;
-  background:white;
-  border-right:1px solid #eee;
-  display:flex;
-  flex-direction:column;
+/* SIDEBAR */
+#sidebar {
+  width: 180px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
 }
-#pages{
-  flex:1;
-  overflow:auto;
+#pages {
+  flex: 1;
+  overflow-y: auto;
 }
-.page{
-  padding:3px 5px;
-  cursor:pointer;
-  border-bottom:1px solid #f1f1f1;
-  font-size:11px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  white-space:nowrap;
+.page {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f7f7f7;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
-.page:hover{
-  background:#f5f6f8;
-}
-.active{
-  background:#e8f0ff;
-}
-.pin{
-  font-size:10px;
-  color:#999;
-  margin-left:4px;
-}
-.dateLabel{
-  font-size:9px;
-  color:#999;
-  margin-left:4px;
-}
-#newPage{
-  margin:4px;
-  padding:4px;
-  border:none;
-  border-radius:4px;
-  background:#2f7ef7;
-  color:white;
-  cursor:pointer;
-  font-size:11px;
-  align-self:stretch;
+.page:hover { background: #f5f5f5; }
+.active { background: #e4f0ff; }
+.pin { font-size: 12px; color: #999; margin-left: 4px; }
+.dateLabel { font-size: 10px; color: #999; margin-left: 4px; }
+#newPage {
+  margin: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  background: #2f7ef7;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
 }
 
 /* TAG PANEL */
-#tagPanel{
-  padding:4px;
-  font-size:10px;
-  border-top:1px solid #eee;
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  max-height:60px;
-  overflow-y:auto;
+#tagPanel {
+  padding: 6px 8px;
+  font-size: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 60px;
+  overflow-y: auto;
 }
-.tagItem{
-  background:#f0f0f0;
-  padding:2px 6px;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:10px;
-  white-space:nowrap;
+.tagItem {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #f2f2f2;
+  cursor: pointer;
+  transition: 0.15s;
 }
-.tagItem:hover{
-  background:#d0e6ff;
-}
+.tagItem:hover { background: #e4f0ff; }
+.tagItem.pinned { background: #fff8e1; font-weight: 600; }
 
-/* MAIN EDITOR */
+/* EDITOR CARD */
 #editorCard {
-  flex:1;
-  margin:12px;
-  background:white;
-  border-radius:12px;
-  border:1px solid #e6e6e6;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05); 
-  transition: box-shadow 0.2s ease;
-}
-
-#editorCard:focus-within {
-  border:1px solid #2f7ef7;
-  box-shadow:0 4px 16px rgba(47,126,247,0.2); 
-}
-
-/* Buttons above title */
-#mode{
-  padding:4px 8px;
-  display:flex;
-  gap:4px;
-  align-items:center;
-  border-bottom:1px solid #eee;
-}
-#mode button {
-  padding:4px 10px;
-  font-size:11px;
-  height:24px;
-  border-radius:6px;
+  flex: 1;
+  margin: 12px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
   transition: all 0.2s;
 }
-#mode button:hover {
-  background:#e8f0ff;
-  border-color:#2f7ef7;
+#editorCard:focus-within {
+  border-color: #2f7ef7;
+  box-shadow: 0 4px 16px rgba(47,126,247,0.15);
 }
-#deleteBtn {margin-left:auto}
 
-#title{
-  border:none;
-  padding:14px 14px 6px 14px;
-  font-size:20px;
-  font-weight:700;
-  outline:none;
-  background:white;
+/* MODE BUTTONS */
+#mode {
+  display: flex;
+  padding: 4px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 6px;
+  align-items: center;
+}
+#mode button {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.15s;
+  height: 26px;
+}
+#mode button:hover { background: #e8f4ff; border-color: #2f7ef7; }
+#mode button.activeMode { background: #2f7ef7; color: #fff; border-color: #1c5fd1; }
+
+/* TITLE & CONTENT */
+#title {
+  font-size: 20px;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  padding: 14px 16px 6px 16px;
+  background: #fff;
+  width: 100%;
 }
 #content {
-  flex:1;
-  min-height:0;
-  border:none;
-  padding:16px 20px;
-  font-family:Consolas, "Courier New", monospace;
-  font-size:15px;
-  line-height:1.8;
-  outline:none;
-  resize:none;
-  background:white;
-  overflow-y:auto;
-  max-width:900px;
-  margin:auto;
-  width:100%;
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 20px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-y: auto;
+  max-width: 900px;
+  width: 100%;
+  margin: auto;
+  word-wrap: break-word;
+  background: #fff;
+  resize: none;
 }
-
 #preview {
-  flex:1;
-  min-height:0;
-  padding:24px 28px;
-  font-size:16px;
-  line-height:1.8;
-  overflow-y:auto;
-  max-width:900px;
-  margin:auto;
-  width:100%;
-  background:#fcfdff; 
-  border-radius:8px;
+  flex: 1;
+  display: none;
+  padding: 24px 28px;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-y: auto;
+  max-width: 900px;
+  width: 100%;
+  margin: auto;
+  background: #fcfdff;
+  border-radius: 8px;
 }
 
 /* META PANELS */
-#tags,#stats,#backlinks{
-  padding:4px 8px;
-  font-size:11px;
-  border-top:1px solid #eee;
-  color:#555;
-  opacity:0.8;
-
-  max-width:900px;
-  margin:auto;
-  width:100%;
-}
-#content,
-#preview{
-  scroll-behavior:smooth;
+#tags,#stats,#backlinks {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-top: 1px solid #eee;
+  color: #555;
+  opacity: 0.85;
+  max-width: 900px;
+  margin: auto;
+  width: 100%;
 }
 
-/* MARKDOWN */
-#preview h1{font-size:22px}
-#preview h2{font-size:18px}
-#preview pre{background:#f1f1f1;padding:8px;border-radius:6px}
-#preview code{background:#f1f1f1;padding:2px 4px;border-radius:4px}
-#preview ul{padding-left:18px}
+/* MARKDOWN PREVIEW STYLING */
+#preview h1 { font-size: 22px; }
+#preview h2 { font-size: 18px; }
+#preview pre { background: #f1f1f1; padding: 8px; border-radius: 6px; }
+#preview code { background: #f1f1f1; padding: 2px 4px; border-radius: 4px; }
+#preview ul { padding-left: 18px; }
+.timestamp { color: #999; font-size: 12px; }
 
-/* COMMAND PALETTE */
-#palette{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:white;
-  width:320px;
-  border-radius:8px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  display:none;
-  flex-direction:column;
+/* COMMAND PALETTE & LINK SUGGEST */
+#palette, #linkSuggest, #hoverPreview {
+  font-size: 12px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  background: #fff;
 }
-#palette input{
-  border:none;
-  border-bottom:1px solid #eee;
-  padding:10px;
-  outline:none;
-}
-.paletteItem{
-  padding:8px;
-  cursor:pointer;
-}
-.paletteItem:hover{
-  background:#f5f6f8;
-}
+#palette { display: none; position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); width: 320px; flex-direction: column; }
+#palette input { border: none; border-bottom: 1px solid #eee; padding: 10px; outline: none; }
+.paletteItem { padding: 8px; cursor: pointer; }
+.paletteItem:hover { background: #f5f5f5; }
+#linkSuggest { display: none; position: absolute; max-height: 160px; overflow-y: auto; z-index: 999; }
+.linkItem { padding: 6px 8px; cursor: pointer; }
+.linkItem:hover { background: #e4f0ff; }
+#hoverPreview { display: none; position: absolute; padding: 10px; width: 260px; max-height: 200px; overflow-y: auto; z-index: 999; }
 
-/* LINK SUGGEST */
-#linkSuggest{
-  position:absolute;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:6px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.15);
-  display:none;
-  max-height:160px;
-  overflow:auto;
-  font-size:12px;
-  z-index:999;
-}
-.linkItem{
-  padding:6px 8px;
-  cursor:pointer;
-}
-.linkItem:hover{
-  background:#f0f4ff;
-}
-
-/* LINK HOVER PREVIEW */
-#hoverPreview{
-  position:absolute;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-  padding:10px;
-  width:260px;
-  max-height:200px;
-  overflow:auto;
-  font-size:12px;
-  display:none;
-  z-index:999;
-}
-
-/* Slight background tint for modes */
-#editorCard.editMode {background: #fff;}
-#editorCard.previewMode {background: #f9faff;}
-#mode button.activeMode {
-  background:#2f7ef7;
-  color:white;
-  border-color:#1c5fd1;
-}
-table{
-border-collapse:collapse;
-}
-
-td,th{
-border:1px solid #ccc;
-padding:6px;
-text-align:center;
-}
-#content:focus {
-  outline:none;
-  background:#fffefc; 
-}
-#content, #preview {
-  max-width:750px;
-  width:100%;
-  margin:auto;
-  word-wrap:break-word;
-}
-#editorCard.darkMode #content, #editorCard.darkMode #preview {
-  background:#1e1e1e;
-  color:#eaeaea;
-}
+/* FOCUS MODE */
 body.focusMode #sidebar,
-body.focusMode #topbar {
-  display: none !important;
-}
-
+body.focusMode #topbar { display: none !important; }
 body.focusMode #editorCard {
   flex: 1 1 100% !important;
   margin: 0 !important;
@@ -330,43 +239,38 @@ body.focusMode #editorCard {
   width: 100% !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  transition: all 0.3s ease;
 }
-.tagItem.pinned {
-  background: #fff8e1; 
-  font-weight: 600;
-  border-radius: 6px;
-}
-.timestamp {
-  color: #999; 
-  font-size: 12px;
-}
+
+/* TABLES */
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
+
 </style>
 </head>
-
 <body>
+
 <div id="topbar">
-<input id="search" placeholder="Search notes (Ctrl + /)">
-<button class="topbtn" onclick="exportNotes()">Export</button>
-<button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
-<input type="file" id="importFile" style="display:none">
+  <input id="search" placeholder="Search notes (Ctrl + /)">
+  <button class="topbtn" onclick="exportNotes()">Export</button>
+  <button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
+  <input type="file" id="importFile" style="display:none">
 </div>
 
 <div id="container">
-  <!-- LEFT SIDEBAR -->
+  <!-- SIDEBAR -->
   <div id="sidebar">
     <div id="pages"></div>
     <div id="tagPanel"></div>
     <button id="newPage">+ New Page</button>
   </div>
 
-  <!-- MAIN EDITOR -->
+  <!-- EDITOR -->
   <div id="editorCard">
     <div id="mode">
       <button onclick="setMode('edit')">Edit</button>
       <button onclick="setMode('preview')">Preview</button>
       <button onclick="togglePin()">Pin</button>
-	  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
+      <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
       <button id="deleteBtn" onclick="deleteNote()">Delete</button>
     </div>
     <input id="title" placeholder="Title">
@@ -386,10 +290,6 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
-// All original JS except todo/sticky note code removed
-// This includes notes handling, renderPages, renderTagPanel, meta panels, title/content, preview, modes, focus, link suggest, export/import, etc.
-// TODO & Sticky note code completely removed
-
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode = "preview"
@@ -694,6 +594,8 @@ preview.addEventListener("mouseover", function(e){
 preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
 
 marked.setOptions({ gfm: true, breaks: true });
+
 </script>
+
 </body>
 </html>
