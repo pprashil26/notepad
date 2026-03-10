@@ -934,47 +934,81 @@ function toggleFocusMode() {
     showTodoBtn.style.display = todoVisible ? "none" : "block";
   }
 }
-// --- INSERT TIMESTAMP (Ctrl + T, Markdown-style) ---
-document.addEventListener("keydown", function(e) {
-    if (e.ctrlKey && e.key.toLowerCase() === "t") {
+
+
+document.addEventListener("keydown", function(e){
+
+    const active = document.activeElement;
+
+    if(active !== content && active !== stickyNote) return;
+
+    // CTRL + T → quick log time bullet
+    if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
         e.preventDefault();
-
-        const active = document.activeElement;
-        if (active === content || active === stickyNote) {
-            insertMarkdownTimestamp(active);
-        }
+        insertTimeBullet(active);
     }
-});
 
-function insertMarkdownTimestamp(el) {
+    // CTRL + SHIFT + T → full timestamp
+    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
+        e.preventDefault();
+        insertFullTimestamp(active);
+    }
+
+});
+function insertTimeBullet(el){
+
     const now = new Date();
     const pad = n => n.toString().padStart(2,"0");
 
-    const tsText = `[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
+    const text = `\n- [${pad(now.getHours())}:${pad(now.getMinutes())}] `;
 
-    if (el.tagName === "TEXTAREA") {
+    insertTextAtCursor(el,text);
+}
+
+
+function insertFullTimestamp(el){
+
+    const now = new Date();
+    const pad = n => n.toString().padStart(2,"0");
+
+    const text =
+`[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
+
+    insertTextAtCursor(el,text);
+}
+function insertTextAtCursor(el,text){
+
+    if(el.tagName === "TEXTAREA"){
+
         const start = el.selectionStart;
         const end = el.selectionEnd;
-        const textBefore = el.value.substring(0, start);
-        const textAfter = el.value.substring(end);
 
-        el.value = textBefore + tsText + textAfter;
-        const cursorPos = start + tsText.length;
-        el.selectionStart = el.selectionEnd = cursorPos;
+        el.value =
+            el.value.substring(0,start) +
+            text +
+            el.value.substring(end);
+
+        const pos = start + text.length;
+
+        el.selectionStart = el.selectionEnd = pos;
 
         el.dispatchEvent(new Event('input'));
-    } else if (el.isContentEditable) {
+    }
+
+    else if(el.isContentEditable){
+
         const sel = window.getSelection();
-        if (!sel.rangeCount) return;
+        if(!sel.rangeCount) return;
+
         const range = sel.getRangeAt(0);
         range.deleteContents();
 
-        // Insert span with subtle color
         const span = document.createElement("span");
         span.className = "timestamp";
-        span.textContent = tsText;
+        span.textContent = text;
 
         range.insertNode(span);
+
         range.setStartAfter(span);
         range.setEndAfter(span);
 
@@ -983,6 +1017,7 @@ function insertMarkdownTimestamp(el) {
 
         el.dispatchEvent(new Event('input'));
     }
-}</script>
+}
+</script>
 </body>
 </html>
