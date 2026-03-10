@@ -548,14 +548,26 @@ function renderPages(filter=""){
 // RENDER TAG PANEL
 function renderTagPanel(){
   let allTags = []
-  notes.forEach(n=>allTags.push(...getTags(n.content)))
+  notes.forEach(n => allTags.push(...getTags(n.content)))
   allTags = [...new Set(allTags)]
-  tagPanel.innerHTML=""
-  allTags.forEach(tag=>{
+  tagPanel.innerHTML = ""
+
+  allTags.forEach(tag => {
     let div = document.createElement("div")
-    div.className="tagItem"
-    div.textContent=tag
-    div.onclick=()=>{search.value=tag; renderPages(tag)}
+    div.className = "tagItem"
+    div.textContent = tag
+
+    // Set background if highlighted
+    div.style.backgroundColor = tagHighlight[tag] ? "#fff9c4" : "#f0f0f0"
+
+    // Toggle highlight on click
+    div.onclick = () => {
+      tagHighlight[tag] = !tagHighlight[tag]
+      renderTagPanel() // re-render to apply color
+      search.value = tag
+      renderPages(tag)
+    }
+
     tagPanel.appendChild(div)
   })
 }
@@ -899,6 +911,7 @@ function insertMarkdownTimestamp(el) {
         el.dispatchEvent(new Event('input'));
     }
 }
+let tagHighlight = {}; // keeps track of which tags are highlighted
 </script>
 </body>
 </html>
