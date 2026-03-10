@@ -434,6 +434,7 @@ body.focusMode #editorCard {
 <body>
 <div id="topbar">
 <input id="search" placeholder="Search notes (Ctrl + /)">
+<button class="topbtn" onclick="insertTimestamp()">Timestamp</button>
 <button class="topbtn" onclick="exportNotes()">Export</button>
 <button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
 <input type="file" id="importFile" style="display:none">
@@ -838,6 +839,45 @@ function toggleFocusMode() {
     todoVisible = prevTodoVisible;
     todoSidebar.style.display = todoVisible ? "flex" : "none";
     showTodoBtn.style.display = todoVisible ? "none" : "block";
+  }
+}
+function insertTimestamp() {
+  const timestamp = new Date().toLocaleString(); // format: 10/3/2026, 10:45:32 AM
+
+  // Determine focused element
+  const activeEl = document.activeElement;
+
+  if (activeEl === content || activeEl === title || activeEl === todoContent || activeEl === stickyNote) {
+    const start = activeEl.selectionStart || 0;
+    const end = activeEl.selectionEnd || 0;
+    const value = activeEl.value || activeEl.innerText;
+
+    const newValue = value.slice(0, start) + timestamp + value.slice(end);
+
+    if (activeEl.tagName === "TEXTAREA" || activeEl.tagName === "INPUT") {
+      activeEl.value = newValue;
+      activeEl.selectionStart = activeEl.selectionEnd = start + timestamp.length;
+      activeEl.focus();
+
+      // Save changes if it's a note or todo
+      if (activeEl === content) {
+        let n = notes.find(x => x.id === current);
+        n.content = activeEl.value;
+        n.updated = Date.now();
+        save();
+        if (mode === "preview") renderPreview();
+        renderMeta(n);
+      } else if (activeEl === todoContent) {
+        saveTodo();
+        if (todoMode === "preview") todoPreview.innerHTML = marked.parse(todoContent.value);
+      }
+    } else if (activeEl === stickyNote) {
+      activeEl.innerText = newValue;
+      activeEl.focus();
+      localStorage.setItem("stickyNote", activeEl.innerText);
+    }
+  } else {
+    alert("Click inside a note, todo, or sticky note first!");
   }
 }
 </script>
