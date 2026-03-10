@@ -987,7 +987,7 @@ function insertMarkdownTimestamp(el) {
         el.dispatchEvent(new Event('input'));
     }
 }
-<!-- Compact Markdown Toolbar -->
+// --- FOCUS MODE & TIMESTAMP HANDLERS REMAIN UNCHANGED ---
 // Wrap selected text in any editor
 function wrapSelectionActive(before, after){
   const active = document.activeElement;
@@ -1088,7 +1088,6 @@ document.addEventListener("keydown", function(e){
     wrapSelectionActive("==","==");
   }
 });
-
 </script>
 </body>
 </html>
