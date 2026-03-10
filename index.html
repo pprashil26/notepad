@@ -518,6 +518,7 @@ function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
 // RENDER PAGES & TAGS
+// --- RENDER PAGES & TAGS ---
 function renderPages(filter=""){
   let pinned=[],others=[]
   const activeTags = Object.keys(tagHighlight).filter(t => tagHighlight[t])
@@ -525,10 +526,17 @@ function renderPages(filter=""){
   notes.forEach(n => {
     // Text search filter
     if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
-    
-    // Tag filter: show only notes containing all active highlighted tags
+
     const noteTags = getTags(n.content)
-    if(activeTags.length && !activeTags.every(t => noteTags.includes(t))) return
+
+    // Tag filter logic
+    if(activeTags.length > 1){
+      // 2 or more highlighted -> show notes containing ANY of these tags
+      if(!noteTags.some(t => activeTags.includes(t))) return
+    } else if(activeTags.length === 1){
+      // 1 highlighted tag -> show notes containing that tag
+      if(!noteTags.includes(activeTags[0])) return
+    }
 
     if(n.pinned) pinned.push(n)
     else others.push(n)
@@ -537,7 +545,7 @@ function renderPages(filter=""){
   pinned.sort((a,b)=>b.created-a.created)
   others.sort((a,b)=>b.created-a.created)
   pages.innerHTML=""
-  
+
   function renderList(list){
     list.forEach(n=>{
       let div=document.createElement("div")
@@ -558,7 +566,7 @@ function renderPages(filter=""){
   renderTagPanel()
 }
 
-// RENDER TAG PANEL
+// --- RENDER TAG PANEL WITH NOTE COUNTS ---
 function renderTagPanel(){
   let allTags = []
   notes.forEach(n => allTags.push(...getTags(n.content)))
@@ -566,9 +574,11 @@ function renderTagPanel(){
   tagPanel.innerHTML = ""
 
   allTags.forEach(tag => {
+    let count = notes.filter(n => getTags(n.content).includes(tag)).length
+
     let div = document.createElement("div")
     div.className = "tagItem"
-    div.textContent = tag
+    div.textContent = `${tag} (${count})`  // show count
 
     // Highlight if toggled
     div.style.backgroundColor = tagHighlight[tag] ? "#fff9c4" : "#f0f0f0"
@@ -583,7 +593,6 @@ function renderTagPanel(){
     tagPanel.appendChild(div)
   })
 }
-
 /* NEW NOTE */
 newPage.onclick = () => {
   let id = Date.now();
