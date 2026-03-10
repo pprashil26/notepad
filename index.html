@@ -281,6 +281,12 @@ body{
   gap:2px;
   flex-wrap:nowrap;
 }
+#todoListWrapper{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
 #todoContent, #todoPreview{
   flex:1;
   padding:4px;
@@ -465,16 +471,19 @@ body.focusMode #editorCard {
   </div>
 
   <!-- RIGHT TODO SIDEBAR -->
-  <div id="todoSidebar">
-    <div id="todoHeader">
-      <span>Todo</span>
-      <div id="todoButtons">
-        <button class="todoBtn" onclick="setTodoMode('edit')">Edit</button>
-        <button class="todoBtn" onclick="setTodoMode('preview')">Preview</button>
-        <button class="todoBtn" onclick="toggleTodo()">⇄</button>
-      </div>
+<div id="todoSidebar">
+  <div id="todoHeader">
+    <span>Todo</span>
+    <div id="todoButtons">
+      <button class="todoBtn" onclick="setTodoMode('edit')">Edit</button>
+      <button class="todoBtn" onclick="setTodoMode('preview')">Preview</button>
+      <button class="todoBtn" onclick="toggleTodo()">⇄</button>
     </div>
-    <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">Write sticky note here...</div>
+  </div>
+
+  <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">Write sticky note here...</div>
+
+  <div id="todoListWrapper">
     <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
     <div id="todoPreview"></div>
   </div>
@@ -652,7 +661,11 @@ function setTodoMode(m){
 todoContent.oninput = ()=>{saveTodo(); if(todoMode==="preview"){todoPreview.innerHTML = marked.parse(todoContent.value)}}
 
 /* TOGGLE TODO */
-function toggleTodo(){todoVisible=!todoVisible; todoSidebar.style.display = todoVisible ? "flex":"none"; showTodoBtn.style.display = todoVisible ? "none":"block"}
+function toggleTodo(){
+    todoVisible = !todoVisible;
+    document.getElementById("todoListWrapper").style.display = todoVisible ? "flex" : "none";
+    showTodoBtn.style.display = todoVisible ? "none" : "block";
+}
 
 /* SEARCH */
 search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
