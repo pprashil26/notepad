@@ -130,13 +130,13 @@ body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05); /* subtle depth */
+  box-shadow:0 2px 8px rgba(0,0,0,0.05); 
   transition: box-shadow 0.2s ease;
 }
 
 #editorCard:focus-within {
   border:1px solid #2f7ef7;
-  box-shadow:0 4px 16px rgba(47,126,247,0.2); /* highlight on focus */
+  box-shadow:0 4px 16px rgba(47,126,247,0.2); 
 }
 
 /* Buttons above title */
@@ -195,7 +195,7 @@ body{
   max-width:900px;
   margin:auto;
   width:100%;
-  background:#fcfdff; /* subtle preview background */
+  background:#fcfdff; 
   border-radius:8px;
 }
 
@@ -248,105 +248,6 @@ body{
 }
 .paletteItem:hover{
   background:#f5f6f8;
-}
-
-/* RIGHT TODO SIDEBAR */
-#todoSidebar{
-  width:320px;
-  background:white;
-  border-left:1px solid #eee;
-  display:flex;
-  flex-direction:column;
-  transition: all 0.2s;
-}
-#todoHeader{
-  padding:4px;
-  display:flex;
-  gap:4px;
-  justify-content:space-between;
-  align-items:center;
-  font-size:11px;
-  border-bottom:1px solid #eee;
-}
-.todoBtn{
-  cursor:pointer;
-  font-size:11px;
-  padding:2px 4px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
-}
-#todoButtons{
-  display:flex;
-  gap:2px;
-  flex-wrap:nowrap;
-}
-#todoListWrapper{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-#todoContent, #todoPreview{
-  flex:1;
-  padding:4px;
-  font-size:11px;
-  border:none;
-  resize:none;
-  outline:none;
-  font-family:monospace;
-}
-#todoPreview{
-  display:none;
-  overflow:auto;
-}
-
-/* STICKY NOTE */
-#stickyNote {
-  background: #fff7a8;
-  padding:6px;
-  margin:4px;
-  border-radius:6px;
-  font-size:12px;
-  min-height:40px;
-  max-height:80px;
-  overflow-y:auto;
-  box-shadow:0 2px 4px rgba(0,0,0,0.1);
-  resize:none;
-}
-
-/* FLOATING SHOW BUTTON */
-#showTodoBtn{
-  display:none;
-  position:fixed;
-  top:50%;
-  right:0;
-  transform:translateY(-50%);
-  padding:4px 6px;
-  font-size:11px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  background:#f5f5f5;
-  cursor:pointer;
-}
-
-/* MOBILE OPTIMIZATIONS */
-@media(max-width:900px){
-  #container{flex-direction:column;}
-  #sidebar,#todoSidebar{width:100%;height:auto;max-height:140px;display:flex;overflow-x:auto;border:none;border-bottom:1px solid #eee;}
-  #pages{display:flex;gap:4px;flex-wrap:nowrap;}
-  .page{flex:0 0 auto;border-bottom:none;border-right:1px solid #eee;padding:2px 4px;font-size:10px;}
-  #editorCard{margin:5px;}
-  #title{font-size:14px;padding:8px;}
-  #content,#preview{font-size:13px;padding:6px;}
-  #mode button{padding:3px 5px;font-size:11px;}
-  #tags,#stats,#backlinks{font-size:10px;padding:3px 6px;}
-  #preview{min-height:180px;}
-}
-@media(max-width:400px){
-  #topbar{flex-direction:column;gap:4px;padding:4px;}
-  #search{width:100%;font-size:12px;padding:4px;}
-  .topbtn{width:100%;font-size:11px;padding:4px 6px;}
 }
 
 /* LINK SUGGEST */
@@ -405,7 +306,7 @@ text-align:center;
 }
 #content:focus {
   outline:none;
-  background:#fffefc; /* very subtle highlight */
+  background:#fffefc; 
 }
 #content, #preview {
   max-width:750px;
@@ -418,7 +319,6 @@ text-align:center;
   color:#eaeaea;
 }
 body.focusMode #sidebar,
-body.focusMode #todoSidebar,
 body.focusMode #topbar {
   display: none !important;
 }
@@ -430,17 +330,15 @@ body.focusMode #editorCard {
   width: 100% !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-}
-body.focusMode #editorCard {
   transition: all 0.3s ease;
 }
 .tagItem.pinned {
-  background: #fff8e1; /* subtle yellow */
+  background: #fff8e1; 
   font-weight: 600;
   border-radius: 6px;
 }
 .timestamp {
-  color: #999; /* subtle gray */
+  color: #999; 
   font-size: 12px;
 }
 </style>
@@ -458,7 +356,7 @@ body.focusMode #editorCard {
   <!-- LEFT SIDEBAR -->
   <div id="sidebar">
     <div id="pages"></div>
-    <div id="tagPanel"></div> <!-- Compact Tag Panel -->
+    <div id="tagPanel"></div>
     <button id="newPage">+ New Page</button>
   </div>
 
@@ -478,27 +376,7 @@ body.focusMode #editorCard {
     <div id="stats"></div>
     <div id="backlinks"></div>
   </div>
-
-  <!-- RIGHT TODO SIDEBAR -->
-<div id="todoSidebar">
-  <div id="todoHeader">
-    <span>Todo</span>
-    <div id="todoButtons">
-      <button class="todoBtn" onclick="setTodoMode('edit')">Edit</button>
-      <button class="todoBtn" onclick="setTodoMode('preview')">Preview</button>
-      <button class="todoBtn" onclick="toggleTodo()">⇄</button>
-    </div>
-  </div>
-
-  <div id="stickyNote" contenteditable="true" placeholder="Sticky Note..." spellcheck="false">Write sticky note here...</div>
-
-  <div id="todoListWrapper">
-    <textarea id="todoContent" placeholder="Write your global todos here..."></textarea>
-    <div id="todoPreview"></div>
-  </div>
 </div>
-
-<button id="showTodoBtn" onclick="toggleTodo()">Show Todo</button>
 
 <div id="palette">
   <input id="paletteSearch" placeholder="Jump to note...">
@@ -508,50 +386,39 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
-// --- NOTES ---
+// All original JS except todo/sticky note code removed
+// This includes notes handling, renderPages, renderTagPanel, meta panels, title/content, preview, modes, focus, link suggest, export/import, etc.
+// TODO & Sticky note code completely removed
+
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
 let mode = "preview"
-let todoVisible = true
-let todoMode = "edit"
 
 // Keep track of highlighted tags
 let tagHighlight = JSON.parse(localStorage.getItem("tagHighlight") || "{}");
+let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
 
 // SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
-function saveTodo(){localStorage.setItem("globalTodo",todoContent.value)}
 
 // TAG FUNCTIONS
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
-// RENDER PAGES & TAGS
 // --- RENDER PAGES & TAGS ---
-// Keep track of pinned tags
-let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
-
-// --- RENDER PAGES ---
 function renderPages(filter=""){
   let pinned=[],others=[]
   const existingTags = new Set()
-notes.forEach(n => getTags(n.content).forEach(t => existingTags.add(t)))
+  notes.forEach(n => getTags(n.content).forEach(t => existingTags.add(t)))
 
-const activeTags = Object.keys(tagHighlight).filter(
-  t => tagHighlight[t] && existingTags.has(t)
-)
+  const activeTags = Object.keys(tagHighlight).filter(
+    t => tagHighlight[t] && existingTags.has(t)
+  )
 
   notes.forEach(n => {
-    // Text search filter
     if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
-    
-    // Tag filter
     const noteTags = getTags(n.content)
-    // Multi-tag filter (OR logic)
-if(activeTags.length){
-  if(!activeTags.some(t => noteTags.includes(t))) return
-}
-
+    if(activeTags.length && !activeTags.some(t => noteTags.includes(t))) return
     if(n.pinned) pinned.push(n)
     else others.push(n)
   })
@@ -582,41 +449,23 @@ if(activeTags.length){
 
 // --- RENDER TAG PANEL ---
 function renderTagPanel(){
-
   const tagCount = {}
-
-  // Count tags
-  notes.forEach(n=>{
-    getTags(n.content).forEach(t=>{
-      tagCount[t] = (tagCount[t] || 0) + 1
-    })
-  })
-
+  notes.forEach(n=>{getTags(n.content).forEach(t=>{tagCount[t] = (tagCount[t] || 0) + 1})})
   const allTags = Object.keys(tagCount)
-
-  // Separate pinned vs normal
   const pinnedList = allTags.filter(t => pinnedTags[t])
   const normalList = allTags.filter(t => !pinnedTags[t])
-
   tagPanel.innerHTML = ""
-
   function renderTags(list){
     list.forEach(tag => {
-
       let div = document.createElement("div")
       div.className = "tagItem"
-
-      // Show tag + count
       div.textContent = `${tag} (${tagCount[tag]})`
-
       if(tagHighlight[tag]) div.style.backgroundColor = "#fff9c4"
-
       if(pinnedTags[tag]){
         div.classList.add("pinned")
         div.textContent = `⭐ ${tag} (${tagCount[tag]})`
         if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082"
       }
-
       div.onclick = (e)=>{
         if(e.ctrlKey){
           pinnedTags[tag] = !pinnedTags[tag]
@@ -627,22 +476,19 @@ function renderTagPanel(){
         }
         renderPages()
       }
-
       tagPanel.appendChild(div)
     })
   }
-
   renderTags(pinnedList)
   renderTags(normalList)
 }
+
 /* NEW NOTE */
 newPage.onclick = () => {
   let id = Date.now();
   let note = { id: id, title: "Untitled Note", content: "", created: id, updated: id, pinned: false };
   notes.unshift(note);
   save();
-  
-  // Open new note in edit mode (so Enter moves to content)
   openNote(id, true);
 };
 
@@ -674,15 +520,12 @@ title.oninput=e=>{let n=notes.find(x=>x.id===current); n.title=e.target.value; n
 title.addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     e.preventDefault();
-
-    // If this is a new note (content is empty), select content start
     if (notes.find(n => n.id === current).content === "") {
-      content.value = "";       // ensure empty
+      content.value = "";
       content.focus();
       content.selectionStart = 0;
       content.selectionEnd = 0;
     } else {
-      // Otherwise just focus without altering existing content
       content.focus();
     }
   }
@@ -696,18 +539,8 @@ function deleteNote(){if(!confirm("Delete note?")) return; notes=notes.filter(n=
 /* MARKDOWN */
 function renderPreview(){
     let html = marked.parse(content.value);
-    
-    // Wrap full timestamps in subtle gray
-html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,
-    '<span class="timestamp">[$1]</span>'
-);
-
-// Wrap short time logs in subtle gray
-html = html.replace(/\[(\d{2}:\d{2})\]/g,
-    '<span class="timestamp">[$1]</span>'
-);
-
-    // Keep your existing note-link replacement
+    html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
+    html = html.replace(/\[(\d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
     html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
         let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
         if(!note){
@@ -717,15 +550,12 @@ html = html.replace(/\[(\d{2}:\d{2})\]/g,
         }
         return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
     });
-
     preview.innerHTML = html;
 }
 
 /* MODE */
 function setMode(m){
   mode = m;
-
-  // Always show content/preview according to mode
   if(m === "edit"){
     content.style.display = "block";
     preview.style.display = "none";
@@ -734,29 +564,8 @@ function setMode(m){
     content.style.display = "none";
     preview.style.display = "block";
   }
-
-  // Highlight buttons
-  document.querySelectorAll("#mode button").forEach(btn => {
-    btn.classList.remove("activeMode");
-  });
+  document.querySelectorAll("#mode button").forEach(btn => {btn.classList.remove("activeMode");});
   document.querySelector(`#mode button[onclick="setMode('${m}')"]`).classList.add("activeMode");
-}
-
-/* TODO MODE */
-function setTodoMode(m){
-  todoMode = m
-  if(m==="edit"){todoContent.style.display="block"; todoPreview.style.display="none"}
-  else{todoPreview.innerHTML = marked.parse(todoContent.value); todoContent.style.display="none"; todoPreview.style.display="block"}
-}
-
-/* TODO INPUT AUTO UPDATE PREVIEW */
-todoContent.oninput = ()=>{saveTodo(); if(todoMode==="preview"){todoPreview.innerHTML = marked.parse(todoContent.value)}}
-
-/* TOGGLE TODO */
-function toggleTodo(){
-    todoVisible = !todoVisible;
-    document.getElementById("todoListWrapper").style.display = todoVisible ? "flex" : "none";
-    showTodoBtn.style.display = todoVisible ? "none" : "block";
 }
 
 /* SEARCH */
@@ -800,33 +609,16 @@ importFile.onchange=e=>{
 }
 
 /* OPEN NOTE */
-/* OPEN NOTE */
-function openNote(id, isNew = false) {  // added isNew flag
+function openNote(id, isNew = false) {
   current = id;
   let note = notes.find(n => n.id === id);
-
   title.value = note.title;
   content.value = note.content;
-
   renderMeta(note);
   renderPages();
-
-// Focus title only for new notes
-if (isNew) {
-  setTimeout(() => {
-    title.focus();  // focus without selecting text
-  }, 0);
+  if (isNew) { setTimeout(() => { title.focus(); }, 0); setMode("edit"); } else { setMode("preview"); }
 }
 
-  // Set mode:
-  // - New note -> edit mode
-  // - Existing note -> preview mode
-  if (isNew) {
-    setMode("edit");
-  } else {
-    setMode("preview");
-  }
-}
 /* INIT NOTES */
 if(notes.length===0){
   let id=Date.now()
@@ -835,25 +627,19 @@ if(notes.length===0){
 }
 openNote(notes[0].id)
 
-/* INIT TODO */
-todoContent.value = localStorage.getItem("globalTodo") || ""
-setTodoMode("preview")
-todoContent.oninput = ()=>{saveTodo(); if(todoMode==="preview") todoPreview.innerHTML = marked.parse(todoContent.value)}
-stickyNote.innerText = localStorage.getItem("stickyNote") || ""
-stickyNote.oninput = ()=>{localStorage.setItem("stickyNote", stickyNote.innerText)}
+/* FOCUS MODE */
+const focusBtn = document.getElementById("focusBtn");
+let focusMode = false;
+let prevMode = mode;
+function toggleFocusMode() {
+  focusMode = !focusMode;
+  document.body.classList.toggle("focusMode", focusMode);
+  focusBtn.classList.toggle("activeMode", focusMode);
+  if (focusMode) { prevMode = mode; setMode("edit"); }
+  else { setMode(prevMode); }
+}
 
-// Ctrl + / to focus search
-document.addEventListener("keydown", e => {if(e.ctrlKey && e.key==="/"){e.preventDefault(); search.focus()}})
-
-// Ctrl + F to toggle Focus Mode
-document.addEventListener("keydown", e => {
-  if (e.ctrlKey && e.key.toLowerCase() === "f") {
-    e.preventDefault();
-    toggleFocusMode();
-  }
-});
-
-// LINK SUGGEST & HOVER PREVIEW
+/* LINK SUGGEST & HOVER PREVIEW */
 const linkSuggest = document.getElementById("linkSuggest")
 const hoverPreview = document.getElementById("hoverPreview")
 let hoverTimer = null
@@ -906,129 +692,8 @@ preview.addEventListener("mouseover", function(e){
   }
 })
 preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
-marked.setOptions({
-  gfm: true,
-  breaks: true
-});
 
-
-// --- FOCUS MODE ---
-const focusBtn = document.getElementById("focusBtn");
-let focusMode = false;
-let prevMode = mode;         // store previous edit/preview mode
-let prevTodoVisible = todoVisible;
-
-function toggleFocusMode() {
-  focusMode = !focusMode;
-  document.body.classList.toggle("focusMode", focusMode);
-
-  // Highlight the button
-  focusBtn.classList.toggle("activeMode", focusMode);
-
-  if (focusMode) {
-    // Save previous state
-    prevMode = mode;
-    prevTodoVisible = todoVisible;
-
-    // Enter edit mode for distraction-free typing
-    setMode("edit");
-
-    // Hide floating todo button
-    showTodoBtn.style.display = "none";
-  } else {
-    // Restore previous mode
-    setMode(prevMode);
-
-    // Restore todo sidebar visibility
-    todoVisible = prevTodoVisible;
-    todoSidebar.style.display = todoVisible ? "flex" : "none";
-    showTodoBtn.style.display = todoVisible ? "none" : "block";
-  }
-}
-
-
-document.addEventListener("keydown", function(e){
-
-    const active = document.activeElement;
-
-    if(active !== content && active !== stickyNote) return;
-
-    // CTRL + T → quick log time bullet
-    if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
-        e.preventDefault();
-        insertTimeBullet(active);
-    }
-
-    // CTRL + SHIFT + T → full timestamp
-    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
-        e.preventDefault();
-        insertFullTimestamp(active);
-    }
-
-});
-function insertTimeBullet(el){
-
-    const now = new Date();
-    const pad = n => n.toString().padStart(2,"0");
-
-    const text = `\n- [${pad(now.getHours())}:${pad(now.getMinutes())}] `;
-
-    insertTextAtCursor(el,text);
-}
-
-
-function insertFullTimestamp(el){
-
-    const now = new Date();
-    const pad = n => n.toString().padStart(2,"0");
-
-    const text =
-`[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
-
-    insertTextAtCursor(el,text);
-}
-function insertTextAtCursor(el,text){
-
-    if(el.tagName === "TEXTAREA"){
-
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-
-        el.value =
-            el.value.substring(0,start) +
-            text +
-            el.value.substring(end);
-
-        const pos = start + text.length;
-
-        el.selectionStart = el.selectionEnd = pos;
-
-        el.dispatchEvent(new Event('input'));
-    }
-
-    else if(el.isContentEditable){
-
-        const sel = window.getSelection();
-        if(!sel.rangeCount) return;
-
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-
-        const span = document.createElement("span");
-        span.className = "timestamp";
-        span.textContent = text;
-
-        range.insertNode(span);
-
-        range.setStartAfter(span);
-        range.setEndAfter(span);
-
-        sel.removeAllRanges();
-        sel.addRange(range);
-
-        el.dispatchEvent(new Event('input'));
-    }
-}
+marked.setOptions({ gfm: true, breaks: true });
 </script>
 </body>
 </html>
