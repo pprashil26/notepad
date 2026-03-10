@@ -434,6 +434,11 @@ body.focusMode #editorCard {
 body.focusMode #editorCard {
   transition: all 0.3s ease;
 }
+.tagItem.pinned {
+  background: #fff8e1; /* subtle yellow */
+  font-weight: 600;
+  border-radius: 6px;
+}
 </style>
 </head>
 
@@ -519,6 +524,10 @@ function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.r
 
 // RENDER PAGES & TAGS
 // --- RENDER PAGES & TAGS ---
+// Keep track of pinned tags
+let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
+
+// --- RENDER PAGES ---
 function renderPages(filter=""){
   let pinned=[],others=[]
   const activeTags = Object.keys(tagHighlight).filter(t => tagHighlight[t])
@@ -526,16 +535,17 @@ function renderPages(filter=""){
   notes.forEach(n => {
     // Text search filter
     if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
-
+    
+    // Tag filter
     const noteTags = getTags(n.content)
-
-    // Tag filter logic
-    if(activeTags.length > 1){
-      // 2 or more highlighted -> show notes containing ANY of these tags
-      if(!noteTags.some(t => activeTags.includes(t))) return
-    } else if(activeTags.length === 1){
-      // 1 highlighted tag -> show notes containing that tag
-      if(!noteTags.includes(activeTags[0])) return
+    if(activeTags.length){
+      if(activeTags.length <= 2){
+        // Require all tags
+        if(!activeTags.every(t => noteTags.includes(t))) return
+      } else {
+        // More than 2 tags → at least one
+        if(!activeTags.some(t => noteTags.includes(t))) return
+      }
     }
 
     if(n.pinned) pinned.push(n)
@@ -566,32 +576,54 @@ function renderPages(filter=""){
   renderTagPanel()
 }
 
-// --- RENDER TAG PANEL WITH NOTE COUNTS ---
+// --- RENDER TAG PANEL ---
 function renderTagPanel(){
   let allTags = []
   notes.forEach(n => allTags.push(...getTags(n.content)))
   allTags = [...new Set(allTags)]
+
+  // Separate pinned vs normal tags
+  let pinnedList = allTags.filter(t => pinnedTags[t])
+  let normalList = allTags.filter(t => !pinnedTags[t])
+
   tagPanel.innerHTML = ""
 
-  allTags.forEach(tag => {
-    let count = notes.filter(n => getTags(n.content).includes(tag)).length
+  function renderTags(list){
+    list.forEach(tag => {
+      let div = document.createElement("div")
+      div.className = "tagItem"
+      div.textContent = tag
 
-    let div = document.createElement("div")
-    div.className = "tagItem"
-    div.textContent = `${tag} (${count})`  // show count
+      // Highlight if toggled
+      if(tagHighlight[tag]) div.style.backgroundColor = "#fff9c4"
 
-    // Highlight if toggled
-    div.style.backgroundColor = tagHighlight[tag] ? "#fff9c4" : "#f0f0f0"
+      // Pinned style
+      if(pinnedTags[tag]){
+        div.classList.add("pinned")
+        div.textContent = "⭐ " + tag
+        if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082" // slightly darker if highlighted
+      }
 
-    // Toggle highlight
-    div.onclick = () => {
-      tagHighlight[tag] = !tagHighlight[tag]
-      localStorage.setItem("tagHighlight", JSON.stringify(tagHighlight))
-      renderPages() // Re-render pages to filter notes based on highlighted tags
-    }
+      // Click: highlight / pin
+      div.onclick = (e) => {
+        if(e.ctrlKey){
+          // Ctrl+Click = toggle pin
+          pinnedTags[tag] = !pinnedTags[tag]
+          localStorage.setItem("pinnedTags", JSON.stringify(pinnedTags))
+        } else {
+          // Normal click = toggle highlight
+          tagHighlight[tag] = !tagHighlight[tag]
+          localStorage.setItem("tagHighlight", JSON.stringify(tagHighlight))
+        }
+        renderPages() // refresh pages and tags
+      }
 
-    tagPanel.appendChild(div)
-  })
+      tagPanel.appendChild(div)
+    })
+  }
+
+  renderTags(pinnedList)
+  renderTags(normalList)
 }
 /* NEW NOTE */
 newPage.onclick = () => {
