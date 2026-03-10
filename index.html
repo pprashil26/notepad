@@ -155,6 +155,31 @@ body {
 #mode button:hover { background: #e8f4ff; border-color: #2f7ef7; }
 #mode button.activeMode { background: #2f7ef7; color: #fff; border-color: #1c5fd1; }
 
+/* EDIT/PREVIEW TOGGLE */
+#toggleModeBtn {
+  position: relative;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid #2f7ef7;
+  background: #2f7ef7;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  min-width: 90px;
+}
+
+#toggleModeBtn:hover {
+  background: #1c5fd1;
+  border-color: #1c5fd1;
+}
+
+#toggleModeBtn.activeMode {
+  background: #2f7ef7;
+  color: #fff;
+  border-color: #2f7ef7;
+}
+
 /* TITLE & CONTENT */
 #title {
   font-size: 20px;
@@ -286,13 +311,12 @@ body.focusMode #editorCard {
 
   <!-- EDITOR -->
   <div id="editorCard">
-    <div id="mode">
-      <button onclick="setMode('edit')">Edit</button>
-      <button onclick="setMode('preview')">Preview</button>
-      <button onclick="togglePin()">Pin</button>
-      <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
-      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-    </div>
+<div id="mode">
+  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit Mode</button>
+  <button onclick="togglePin()">Pin</button>
+  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
+  <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+</div>
     <input id="title" placeholder="Title">
     <textarea id="content"></textarea>
     <div id="preview"></div>
@@ -474,18 +498,34 @@ function renderPreview(){
 }
 
 /* MODE */
+// Toggle between Edit and Preview with one button
+function toggleEditPreview() {
+    if(mode === "edit") {
+        setMode("preview");
+    } else {
+        setMode("edit");
+    }
+}
+
+// Update editor/preview display and button text
 function setMode(m){
-  mode = m;
-  if(m === "edit"){
-    content.style.display = "block";
-    preview.style.display = "none";
-  } else {
-    renderPreview();
-    content.style.display = "none";
-    preview.style.display = "block";
-  }
-  document.querySelectorAll("#mode button").forEach(btn => {btn.classList.remove("activeMode");});
-  document.querySelector(`#mode button[onclick="setMode('${m}')"]`).classList.add("activeMode");
+    mode = m;
+    const toggleBtn = document.getElementById("toggleModeBtn");
+
+    if(m === "edit"){
+        content.style.display = "block";
+        preview.style.display = "none";
+        toggleBtn.textContent = "Edit Mode";  // indicates current mode
+    } else {
+        renderPreview();
+        content.style.display = "none";
+        preview.style.display = "block";
+        toggleBtn.textContent = "Preview Mode"; // indicates current mode
+    }
+
+    // Highlight active mode button
+    document.querySelectorAll("#mode button").forEach(btn => btn.classList.remove("activeMode"));
+    toggleBtn.classList.add("activeMode");
 }
 
 /* SEARCH */
