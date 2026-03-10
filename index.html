@@ -534,7 +534,12 @@ let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
 // --- RENDER PAGES ---
 function renderPages(filter=""){
   let pinned=[],others=[]
-  const activeTags = Object.keys(tagHighlight).filter(t => tagHighlight[t])
+  const existingTags = new Set()
+notes.forEach(n => getTags(n.content).forEach(t => existingTags.add(t)))
+
+const activeTags = Object.keys(tagHighlight).filter(
+  t => tagHighlight[t] && existingTags.has(t)
+)
 
   notes.forEach(n => {
     // Text search filter
