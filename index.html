@@ -499,7 +499,6 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
-<script>
 // --- NOTES ---
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
 let current = null
@@ -924,7 +923,7 @@ function insertMarkdownTimestamp(el) {
         el.dispatchEvent(new Event('input'));
     }
 }
-let tagHighlight = {}; // keeps track of which tags are highlighted
+
 </script>
 </body>
 </html>
