@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad v2.7</title>
+<title>Notepad v2.5</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
@@ -546,22 +546,16 @@ function toggleEditPreview() {
 // Update editor/preview display and button text
 function setMode(m){
     mode = m;
-    const toggleBtn = document.getElementById("toggleModeBtn");
 
     if(m === "edit"){
         content.style.display = "block";
         preview.style.display = "none";
-        toggleBtn.textContent = "Edit Mode";  // indicates current mode
-    } else {
+    } 
+    else {
         renderPreview();
         content.style.display = "none";
         preview.style.display = "block";
-        toggleBtn.textContent = "Preview Mode"; // indicates current mode
     }
-
-    // Highlight active mode button
-    document.querySelectorAll("#mode button").forEach(btn => btn.classList.remove("activeMode"));
-    toggleBtn.classList.add("activeMode");
 }
 
 /* SEARCH */
@@ -627,12 +621,17 @@ openNote(notes[0].id)
 const focusBtn = document.getElementById("focusBtn");
 let focusMode = false;
 let prevMode = mode;
+
 function toggleFocusMode() {
   focusMode = !focusMode;
   document.body.classList.toggle("focusMode", focusMode);
-  focusBtn.classList.toggle("activeMode", focusMode);
-  if (focusMode) { prevMode = mode; setMode("edit"); }
-  else { setMode(prevMode); }
+
+  if (focusMode) {
+    prevMode = mode;
+    setMode("edit");
+  } else {
+    setMode(prevMode);
+  }
 }
 
 /* LINK SUGGEST & HOVER PREVIEW */
@@ -699,17 +698,20 @@ document.addEventListener("keydown", function(e){
     return
   }
   
-    // Ctrl + X → Export
-  if(e.ctrlKey && e.key.toLowerCase() === "x"){
-    e.preventDefault()
-    exportNotes()
-  }
+// Ctrl + X → Export
+if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "x"){
+  if(document.activeElement === content) return
+  e.preventDefault()
+  exportNotes()
+  return
+}
 
-  // Ctrl + I → Import
-  if(e.ctrlKey && e.key.toLowerCase() === "i"){
-    e.preventDefault()
-    document.getElementById("importFile").click()
-  }
+// Ctrl + I → Import
+if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "i"){
+  e.preventDefault()
+  document.getElementById("importFile").click()
+  return
+}
 
   // Ctrl + Shift + Z → Redo
   if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z"){
@@ -760,11 +762,11 @@ if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
     newPage.click()
   }
 
-  // Ctrl + F ? focus mode
-  if(e.ctrlKey && e.key.toLowerCase() === "f"){
-    e.preventDefault()
-    toggleFocusMode()
-  }
+// Ctrl + F → focus mode
+if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "f"){
+  e.preventDefault()
+  toggleFocusMode()
+}
 
   // Ctrl + E → toggle Edit / Preview
   if(e.ctrlKey && e.key.toLowerCase() === "e"){
