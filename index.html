@@ -663,18 +663,25 @@ preview.addEventListener("mouseout", function(e){if(e.target.classList.contains(
 
 document.addEventListener("keydown", function(e){
 
-  // Ctrl + T → insert time [hh:mm]
-  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
-    e.preventDefault()
+ // Ctrl + T → fast work log timestamp
+if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
+  e.preventDefault()
 
-    let now = new Date()
-    let hh = String(now.getHours()).padStart(2,"0")
-    let mm = String(now.getMinutes()).padStart(2,"0")
+  let now = new Date()
+  let hh = String(now.getHours()).padStart(2,"0")
+  let mm = String(now.getMinutes()).padStart(2,"0")
 
-    let stamp = `[${hh}:${mm}]`
+  let stamp = `[${hh}:${mm}] `
 
-    insertAtCursor(stamp + "\n")
+  let start = content.selectionStart
+  let before = content.value.substring(0,start)
+
+  if(before.length && before[before.length-1] !== "\n"){
+    stamp = "\n" + stamp
   }
+
+  insertAtCursor(stamp)
+}
 
   // Ctrl + Shift + T → full timestamp [YYYY-MM-DD hh:mm]
   if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
@@ -721,6 +728,30 @@ function insertAtCursor(text){
   content.dispatchEvent(new Event("input"))
 }
 marked.setOptions({ gfm: true, breaks: true });
+
+/* ENTER → CONTINUE TIMESTAMP LOG */
+
+content.addEventListener("keydown", function(e){
+
+  if(e.key !== "Enter") return
+
+  let start = content.selectionStart
+  let before = content.value.substring(0,start)
+
+  let lines = before.split("\n")
+  let currentLine = lines[lines.length-1]
+
+  let match = currentLine.match(/^\[(\d{2}:\d{2})\]/)
+
+  if(match){
+    e.preventDefault()
+
+    let timestamp = match[0]
+
+    insertAtCursor("\n" + timestamp + " ")
+  }
+
+})
 
 </script>
 
