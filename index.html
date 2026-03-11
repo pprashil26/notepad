@@ -387,7 +387,7 @@ function renderPages(filter=""){
       let d=new Date(n.created)
       date.textContent=`${d.getDate()}/${d.getMonth()+1}`
       date.className="dateLabel"
-      let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"📌":""
+      let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"??":""
       div.appendChild(t);div.appendChild(date);div.appendChild(p)
       div.onclick=()=>openNote(n.id)
       pages.appendChild(div)
@@ -414,7 +414,7 @@ function renderTagPanel(){
       if(tagHighlight[tag]) div.style.backgroundColor = "#fff9c4"
       if(pinnedTags[tag]){
         div.classList.add("pinned")
-        div.textContent = `⭐ ${tag} (${tagCount[tag]})`
+        div.textContent = `? ${tag} (${tagCount[tag]})`
         if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082"
       }
       div.onclick = (e)=>{
@@ -663,7 +663,7 @@ preview.addEventListener("mouseout", function(e){if(e.target.classList.contains(
 
 document.addEventListener("keydown", function(e){
 
- // Ctrl + T → fast work log timestamp
+ // Ctrl + T ? fast work log timestamp
 if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
   e.preventDefault()
 
@@ -683,7 +683,7 @@ if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
   insertAtCursor(stamp)
 }
 
-  // Ctrl + Shift + T → full timestamp [YYYY-MM-DD hh:mm]
+  // Ctrl + Shift + T ? full timestamp [YYYY-MM-DD hh:mm]
   if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
     e.preventDefault()
 
@@ -699,19 +699,25 @@ if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
     insertAtCursor(stamp)
   }
 
-  // Ctrl + N → new page
+  // Ctrl + N ? new page
   if(e.ctrlKey && e.key.toLowerCase() === "n"){
     e.preventDefault()
     newPage.click()
   }
 
-  // Ctrl + F → focus mode
+  // Ctrl + F ? focus mode
   if(e.ctrlKey && e.key.toLowerCase() === "f"){
     e.preventDefault()
     toggleFocusMode()
   }
 
 })
+
+// Ctrl + E ? toggle Edit / Preview mode
+if(e.ctrlKey && e.key.toLowerCase() === "e"){
+  e.preventDefault()
+  toggleEditPreview()
+}
 
 
 function insertAtCursor(text){
@@ -729,7 +735,7 @@ function insertAtCursor(text){
 }
 marked.setOptions({ gfm: true, breaks: true });
 
-/* ENTER → CONTINUE TIMESTAMP LOG */
+/* ENTER ? CONTINUE TIMESTAMP LOG */
 
 content.addEventListener("keydown", function(e){
 
