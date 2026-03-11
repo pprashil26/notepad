@@ -577,30 +577,13 @@ importFile.onchange=e=>{
 
 /* OPEN NOTE */
 function openNote(id, isNew = false) {
-  current = id
-
-  let note = notes.find(n => n.id === id)
-
-  title.value = note.title
-  content.value = note.content
-
-  renderMeta(note)
-  renderPages()
-
-  if(isNew){
-    setTimeout(()=>{ title.focus() },0)
-    setMode("edit")
-  }else{
-    // keep current mode instead of forcing preview
-    if(mode === "preview"){
-      renderPreview()
-      content.style.display = "none"
-      preview.style.display = "block"
-    }else{
-      content.style.display = "block"
-      preview.style.display = "none"
-    }
-  }
+  current = id;
+  let note = notes.find(n => n.id === id);
+  title.value = note.title;
+  content.value = note.content;
+  renderMeta(note);
+  renderPages();
+  if (isNew) { setTimeout(() => { title.focus(); }, 0); setMode("edit"); } else { setMode("preview"); }
 }
 
 /* INIT NOTES */
@@ -730,7 +713,7 @@ if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
 
 })
 
-// Ctrl + E → toggle Edit / Preview
+// Ctrl + E ? toggle Edit / Preview mode
 if(e.ctrlKey && e.key.toLowerCase() === "e"){
   e.preventDefault()
   toggleEditPreview()
