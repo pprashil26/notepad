@@ -665,6 +665,20 @@ preview.addEventListener("mouseout", function(e){if(e.target.classList.contains(
 
 document.addEventListener("keydown", function(e){
 
+  // Ctrl + Z → Undo
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "z"){
+    e.preventDefault()
+    document.execCommand("undo")
+    return
+  }
+
+  // Ctrl + Shift + Z → Redo
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z"){
+    e.preventDefault()
+    document.execCommand("redo")
+    return
+  }
+
  // Ctrl + T ? fast work log timestamp
 if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
   e.preventDefault()
@@ -713,25 +727,28 @@ if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
     toggleFocusMode()
   }
 
-})
+  // Ctrl + E → toggle Edit / Preview
+  if(e.ctrlKey && e.key.toLowerCase() === "e"){
+    e.preventDefault()
+    toggleEditPreview()
+  }
 
-// Ctrl + E ? toggle Edit / Preview mode
-if(e.ctrlKey && e.key.toLowerCase() === "e"){
-  e.preventDefault()
-  toggleEditPreview()
-}
+})
 
 
 function insertAtCursor(text){
-  let start = content.selectionStart
-  let end = content.selectionEnd
 
-  content.value =
-    content.value.substring(0,start) +
-    text +
-    content.value.substring(end)
+  content.focus()
 
-  content.selectionStart = content.selectionEnd = start + text.length
+  // Use browser native editing so undo stack is preserved
+  if(document.queryCommandSupported && document.queryCommandSupported("insertText")){
+      document.execCommand("insertText", false, text)
+  } 
+  else {
+      let start = content.selectionStart
+      let end = content.selectionEnd
+      content.setRangeText(text, start, end, "end")
+  }
 
   content.dispatchEvent(new Event("input"))
 }
