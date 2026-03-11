@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad v2.3 Ultra Minimal</title>
+<title>Notepad v2.5</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
@@ -273,18 +273,20 @@ body {
 .linkItem:hover { background: #e4f0ff; }
 #hoverPreview { display: none; position: absolute; padding: 10px; width: 260px; max-height: 200px; overflow-y: auto; z-index: 999; }
 
-/* FOCUS MODE */
+/* ===== FOCUS MODE ===== */
 body.focusMode #sidebar,
-body.focusMode #topbar { display: none !important; }
-body.focusMode #editorCard {
-  flex: 1 1 100% !important;
-  margin: 0 !important;
-  max-width: none !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+body.focusMode #topbar {
+  display: none !important;   /* hide sidebar and topbar */
 }
 
+body.focusMode #editorCard {
+  max-width: 600px;           /* same notebook card width */
+  width: 100%;
+  margin: 40px auto;          /* vertical spacing */
+  border-radius: 12px;        /* same as normal */
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1); /* subtle shadow */
+  flex: unset;                /* remove previous flex overrides */
+}
 /* TABLES */
 table { border-collapse: collapse; }
 td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
