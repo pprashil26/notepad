@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notepad v2.3 Ultra Minimal</title>
+<title>Notepad v2.3 Ultra Minimal Fixed</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
-/* GLOBAL STYLING */
+/* ===== GLOBAL ===== */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
@@ -17,7 +17,7 @@ body {
   color: #111;
 }
 
-/* TOPBAR */
+/* ===== TOPBAR ===== */
 #topbar {
   background: #fff;
   display: flex;
@@ -47,14 +47,14 @@ body {
   border-color: #2f7ef7;
 }
 
-/* MAIN LAYOUT */
+/* ===== MAIN LAYOUT ===== */
 #container {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar {
   width: 180px;
   background: #fff;
@@ -93,7 +93,7 @@ body {
   text-align: center;
 }
 
-/* TAG PANEL */
+/* ===== TAG PANEL ===== */
 #tagPanel {
   padding: 6px 8px;
   font-size: 11px;
@@ -113,12 +113,11 @@ body {
 .tagItem:hover { background: #e4f0ff; }
 .tagItem.pinned { background: #fff8e1; font-weight: 600; }
 
-/* EDITOR CARD */
+/* ===== EDITOR CARD ===== */
 #editorCard {
   flex: 1;
-  max-width: 600px;            
-  width: 100%;
-  margin: 20px auto;           
+  max-width: 700px;
+  margin: 20px auto;
   border-radius: 12px;
   border: 1px solid #e6e6e6;
   background: #fff;
@@ -133,7 +132,7 @@ body {
   box-shadow: 0 6px 20px rgba(47,126,247,0.15);
 }
 
-/* MODE BUTTONS */
+/* ===== MODE BUTTONS ===== */
 #mode {
   display: flex;
   padding: 4px 8px;
@@ -154,7 +153,7 @@ body {
 #mode button:hover { background: #e8f4ff; border-color: #2f7ef7; }
 #mode button.activeMode { background: #2f7ef7; color: #fff; border-color: #1c5fd1; }
 
-/* EDIT/PREVIEW TOGGLE */
+/* ===== EDIT/PREVIEW ===== */
 #toggleModeBtn {
   position: relative;
   font-size: 11px;
@@ -170,7 +169,7 @@ body {
 #toggleModeBtn:hover { background: #1c5fd1; border-color: #1c5fd1; }
 #toggleModeBtn.activeMode { background: #2f7ef7; color: #fff; border-color: #2f7ef7; }
 
-/* TITLE & CONTENT */
+/* ===== TITLE & CONTENT ===== */
 #title {
   font-size: 20px;
   font-weight: 600;
@@ -185,16 +184,13 @@ body {
   flex: 1;
   border: none;
   outline: none;
-  padding: 24px 20px;           
+  padding: 24px 20px;
   font-family: "Consolas", "Courier New", monospace;
   font-size: 15px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 560px;             
   width: 100%;
-  margin: auto;                 
-  word-wrap: break-word;
-  background: repeating-linear-gradient(   
+  background: repeating-linear-gradient(
     to bottom,
     #fff,
     #fff 28px,
@@ -203,8 +199,6 @@ body {
   );
   resize: none;
 }
-
-/* PREVIEW */
 #preview {
   flex: 1;
   display: none;
@@ -212,14 +206,12 @@ body {
   font-size: 16px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 560px;             
   width: 100%;
-  margin: auto;                 
   background: #fcfdff;
   border-radius: 8px;
 }
 
-/* META PANELS */
+/* ===== META PANELS ===== */
 #tags,#stats,#backlinks {
   padding: 4px 8px;
   font-size: 11px;
@@ -231,7 +223,7 @@ body {
   width: 100%;
 }
 
-/* MARKDOWN PREVIEW STYLING */
+/* ===== MARKDOWN PREVIEW ===== */
 #preview h1 { font-size: 22px; }
 #preview h2 { font-size: 18px; }
 #preview pre { background: #f1f1f1; padding: 8px; border-radius: 6px; }
@@ -239,7 +231,7 @@ body {
 #preview ul { padding-left: 18px; }
 .timestamp { color: #999; font-size: 12px; }
 
-/* COMMAND PALETTE & LINK SUGGEST */
+/* ===== COMMAND PALETTE & LINK SUGGEST ===== */
 #palette, #linkSuggest, #hoverPreview {
   font-size: 12px;
   border-radius: 8px;
@@ -255,28 +247,16 @@ body {
 .linkItem:hover { background: #e4f0ff; }
 #hoverPreview { display: none; position: absolute; padding: 10px; width: 260px; max-height: 200px; overflow-y: auto; z-index: 999; }
 
-/* FOCUS MODE */
+/* ===== FOCUS MODE ===== */
 body.focusMode #sidebar,
 body.focusMode #topbar { display: none !important; }
 body.focusMode #editorCard {
-  flex: 1 1 100% !important;
-  margin: 0 !important;
-  max-width: none !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-/* TABLES */
-table { border-collapse: collapse; }
-td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
-
-body.focusMode #editorCard {
-  max-width: 600px;
+  flex: 1;
+  margin: 0;
   width: 100%;
-  margin: 40px auto;             
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  max-width: 100%;
+  border-radius: 0;
+  box-shadow: none;
 }
 </style>
 </head>
@@ -320,7 +300,7 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
-// =================== FULL JS ===================
+// ===== FULL JS (unchanged, fixed minor focus/width issues)
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]");
 let current = null;
 let mode = "preview";
@@ -329,8 +309,6 @@ let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
-
-// =================== TIMESTAMP SHORTCUTS ===================
 content.addEventListener("keydown", function(e){
     if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
         e.preventDefault();
@@ -351,8 +329,6 @@ content.addEventListener("keydown", function(e){
         content.focus();
     }
 });
-
-// =================== REST OF ORIGINAL JS (renderPages, renderTagPanel, openNote, preview, edit/preview toggle, focus mode, export/import, backlinks) ===================
 
 // --- RENDER PAGES ---
 function renderPages(filter=""){
@@ -524,6 +500,7 @@ search.oninput=e=>renderPages(e.target.value.toLowerCase())
 /* INITIAL RENDER */
 renderPages()
 if(notes.length>0) openNote(notes[0].id)
+
 </script>
 </body>
 </html>
