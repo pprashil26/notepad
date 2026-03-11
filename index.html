@@ -345,6 +345,21 @@ let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
 // SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
 
+function newNote() {
+  let id = Date.now();
+  let note = {
+    id: id,
+    title: "Untitled Note",
+    content: "",
+    created: id,
+    updated: id,
+    pinned: false
+  };
+  notes.unshift(note); // add to start of notes
+  save();              // save to localStorage
+  openNote(id, true);  // open immediately in edit mode
+}
+
 // TAG FUNCTIONS
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
@@ -428,13 +443,7 @@ function renderTagPanel(){
 }
 
 /* NEW NOTE */
-newPage.onclick = () => {
-  let id = Date.now();
-  let note = { id: id, title: "Untitled Note", content: "", created: id, updated: id, pinned: false };
-  notes.unshift(note);
-  save();
-  openNote(id, true);
-};
+newPage.onclick = newNote;
 
 /* META PANELS */
 function renderMeta(note){
@@ -576,6 +585,7 @@ function openNote(id, isNew = false) {
   content.value = note.content;
   renderMeta(note);
   renderPages();
+  autoTimestamp = false; // reset
   if (isNew) { setTimeout(() => { title.focus(); }, 0); setMode("edit"); } else { setMode("preview"); }
 }
 
@@ -654,6 +664,104 @@ preview.addEventListener("mouseover", function(e){
 preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
 
 marked.setOptions({ gfm: true, breaks: true });
+
+/* TIMESTAMP INSERTION */
+
+let autoTimestamp = false;
+
+function insertAtCursor(text){
+  const start = content.selectionStart;
+  const end = content.selectionEnd;
+
+  const before = content.value.substring(0,start);
+  const after = content.value.substring(end);
+
+  content.value = before + text + after;
+
+  content.selectionStart = content.selectionEnd = start + text.length;
+  content.focus();
+
+  content.dispatchEvent(new Event("input"));
+}
+
+function getShortTime(){
+  const d = new Date();
+  const hh = String(d.getHours()).padStart(2,"0");
+  const mm = String(d.getMinutes()).padStart(2,"0");
+  return `[${hh}:${mm}] `;
+}
+
+function getFullTimestamp(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  const hh = String(d.getHours()).padStart(2,"0");
+  const min = String(d.getMinutes()).padStart(2,"0");
+
+  return `[${yyyy}-${mm}-${dd} ${hh}:${min}] `;
+}
+
+function insertShortTime(){
+  insertAtCursor(getShortTime());
+  autoTimestamp = true;
+}
+
+function insertFullTimestamp(){
+  insertAtCursor(getFullTimestamp());
+}
+
+content.addEventListener("keydown", function(e){
+
+  if(e.key === "Enter" && autoTimestamp){
+
+    const pos = content.selectionStart;
+
+    const before = content.value.substring(0,pos);
+    const after = content.value.substring(pos);
+
+    const stamp = "\n" + getShortTime();
+
+    content.value = before + stamp + after;
+
+    const newPos = pos + stamp.length;
+
+    content.selectionStart = content.selectionEnd = newPos;
+
+    e.preventDefault();
+
+    content.dispatchEvent(new Event("input"));
+  }
+
+});
+
+document.addEventListener("keydown", function(e){
+
+  /* Ctrl + T → short time */
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
+    e.preventDefault();
+    insertShortTime();
+  }
+
+  /* Ctrl + Shift + T → full timestamp */
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
+    e.preventDefault();
+    insertFullTimestamp();
+  }
+
+  /* Ctrl + F → focus mode */
+  if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "f"){
+    e.preventDefault();
+    toggleFocusMode();
+  }
+
+  /* Ctrl + N → new note */
+  if(e.ctrlKey && e.key.toLowerCase() === "n"){
+    e.preventDefault();
+    newNote();
+  }
+
+});
 
 </script>
 
