@@ -64,6 +64,26 @@ body {
   flex-direction: column;
   font-size: 12px;
 }
+
+#sidebarActions{
+  border-top:1px solid #eee;
+  border-bottom:1px solid #eee;
+  padding:6px 0;
+  margin-bottom:4px;
+}
+
+.sideAction{
+  padding:5px 12px;
+  cursor:pointer;
+  color:#444;
+  font-size:12px;
+  transition:0.15s;
+}
+
+.sideAction:hover{
+  background:#f5f8ff;
+  color:#2f7ef7;
+}
 #pages {
   flex: 1;
   overflow-y: auto;
@@ -305,27 +325,34 @@ body.focusMode #editorCard {
 
 <div id="topbar">
   <input id="search" placeholder="Search notes (Ctrl + /)">
-  <button class="topbtn" onclick="exportNotes()">Export</button>
-  <button class="topbtn" onclick="document.getElementById('importFile').click()">Import</button>
   <input type="file" id="importFile" style="display:none">
 </div>
 
 <div id="container">
   <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div id="pages"></div>
-    <div id="tagPanel"></div>
-    <button id="newPage">+ New Page ( ctrl+N ) </button>
+<div id="sidebar">
+
+  <div id="pages"></div>
+
+  <div id="sidebarActions">
+    <div class="sideAction" id="newPage">New Page (Ctrl+N)</div>
+
+    <div class="sideAction" onclick="exportNotes()">Export (Ctrl+X)</div>
+    <div class="sideAction" onclick="document.getElementById('importFile').click()">Import (Ctrl+I)</div>
+
+    <div class="sideAction" onclick="toggleEditPreview()">Edit / Preview (Ctrl+E)</div>
+    <div class="sideAction" onclick="togglePin()">Pin</div>
+    <div class="sideAction" onclick="deleteNote()">Delete</div>
+    <div class="sideAction" onclick="toggleFocusMode()">Focus (Ctrl+F)</div>
   </div>
+
+  <div id="tagPanel"></div>
+
+</div>
 
   <!-- EDITOR -->
   <div id="editorCard">
-<div id="mode">
-  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit Mode</button>
-  <button onclick="togglePin()">Pin</button>
-  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
-  <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-</div>
+
     <input id="title" placeholder="Title">
     <textarea id="content"></textarea>
     <div id="preview"></div>
@@ -670,6 +697,18 @@ document.addEventListener("keydown", function(e){
     e.preventDefault()
     document.execCommand("undo")
     return
+  }
+  
+    // Ctrl + X → Export
+  if(e.ctrlKey && e.key.toLowerCase() === "x"){
+    e.preventDefault()
+    exportNotes()
+  }
+
+  // Ctrl + I → Import
+  if(e.ctrlKey && e.key.toLowerCase() === "i"){
+    e.preventDefault()
+    document.getElementById("importFile").click()
   }
 
   // Ctrl + Shift + Z → Redo
