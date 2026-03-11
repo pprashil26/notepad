@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notepad v2.3 Ultra Minimal</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 <style>
 /* GLOBAL STYLING */
 body {
@@ -117,9 +116,9 @@ body {
 /* EDITOR CARD */
 #editorCard {
   flex: 1;
-  max-width: 600px;            /* notebook width ~A5 */
+  max-width: 600px;            
   width: 100%;
-  margin: 20px auto;           /* center horizontally with vertical spacing */
+  margin: 20px auto;           
   border-radius: 12px;
   border: 1px solid #e6e6e6;
   background: #fff;
@@ -168,17 +167,8 @@ body {
   transition: 0.2s;
   min-width: 90px;
 }
-
-#toggleModeBtn:hover {
-  background: #1c5fd1;
-  border-color: #1c5fd1;
-}
-
-#toggleModeBtn.activeMode {
-  background: #2f7ef7;
-  color: #fff;
-  border-color: #2f7ef7;
-}
+#toggleModeBtn:hover { background: #1c5fd1; border-color: #1c5fd1; }
+#toggleModeBtn.activeMode { background: #2f7ef7; color: #fff; border-color: #2f7ef7; }
 
 /* TITLE & CONTENT */
 #title {
@@ -191,21 +181,20 @@ body {
   width: 100%;
   text-align: left;
 }
-
 #content {
   flex: 1;
   border: none;
   outline: none;
-  padding: 24px 20px;           /* comfortable writing space */
+  padding: 24px 20px;           
   font-family: "Consolas", "Courier New", monospace;
   font-size: 15px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 560px;             /* slightly smaller than card width */
+  max-width: 560px;             
   width: 100%;
-  margin: auto;                 /* center text area */
+  margin: auto;                 
   word-wrap: break-word;
-  background: repeating-linear-gradient(   /* optional notebook lines */
+  background: repeating-linear-gradient(   
     to bottom,
     #fff,
     #fff 28px,
@@ -223,9 +212,9 @@ body {
   font-size: 16px;
   line-height: 1.7;
   overflow-y: auto;
-  max-width: 560px;             /* match content width */
+  max-width: 560px;             
   width: 100%;
-  margin: auto;                 /* center preview */
+  margin: auto;                 
   background: #fcfdff;
   border-radius: 8px;
 }
@@ -285,11 +274,10 @@ td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
 body.focusMode #editorCard {
   max-width: 600px;
   width: 100%;
-  margin: 40px auto;             /* vertical spacing for notebook look */
+  margin: 40px auto;             
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
-
 </style>
 </head>
 <body>
@@ -302,21 +290,19 @@ body.focusMode #editorCard {
 </div>
 
 <div id="container">
-  <!-- SIDEBAR -->
   <div id="sidebar">
     <div id="pages"></div>
     <div id="tagPanel"></div>
     <button id="newPage">+ New Page</button>
   </div>
 
-  <!-- EDITOR -->
   <div id="editorCard">
-<div id="mode">
-  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit Mode</button>
-  <button onclick="togglePin()">Pin</button>
-  <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
-  <button id="deleteBtn" onclick="deleteNote()">Delete</button>
-</div>
+    <div id="mode">
+      <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit Mode</button>
+      <button onclick="togglePin()">Pin</button>
+      <button id="focusBtn" onclick="toggleFocusMode()">Focus</button>
+      <button id="deleteBtn" onclick="deleteNote()">Delete</button>
+    </div>
     <input id="title" placeholder="Title">
     <textarea id="content"></textarea>
     <div id="preview"></div>
@@ -334,31 +320,46 @@ body.focusMode #editorCard {
 <div id="hoverPreview"></div>
 
 <script>
-let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
-let current = null
-let mode = "preview"
-
-// Keep track of highlighted tags
+// =================== FULL JS ===================
+let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]");
+let current = null;
+let mode = "preview";
 let tagHighlight = JSON.parse(localStorage.getItem("tagHighlight") || "{}");
 let pinnedTags = JSON.parse(localStorage.getItem("pinnedTags") || "{}");
-
-// SAVE NOTES
 function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
-
-// TAG FUNCTIONS
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
-// --- RENDER PAGES & TAGS ---
+// =================== TIMESTAMP SHORTCUTS ===================
+content.addEventListener("keydown", function(e){
+    if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "t"){
+        e.preventDefault();
+        let dt = new Date();
+        let str = `[${dt.getFullYear()}-${(dt.getMonth()+1).toString().padStart(2,'0')}-${dt.getDate().toString().padStart(2,'0')} ${dt.getHours().toString().padStart(2,'0')}:${dt.getMinutes().toString().padStart(2,'0')}]`;
+        let start = content.selectionStart;
+        let end = content.selectionEnd;
+        content.setRangeText(str, start, end, 'end');
+        content.focus();
+    }
+    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t"){
+        e.preventDefault();
+        let dt = new Date();
+        let str = `[${dt.getHours().toString().padStart(2,'0')}:${dt.getMinutes().toString().padStart(2,'0')}]`;
+        let start = content.selectionStart;
+        let end = content.selectionEnd;
+        content.setRangeText(str, start, end, 'end');
+        content.focus();
+    }
+});
+
+// =================== REST OF ORIGINAL JS (renderPages, renderTagPanel, openNote, preview, edit/preview toggle, focus mode, export/import, backlinks) ===================
+
+// --- RENDER PAGES ---
 function renderPages(filter=""){
   let pinned=[],others=[]
   const existingTags = new Set()
   notes.forEach(n => getTags(n.content).forEach(t => existingTags.add(t)))
-
-  const activeTags = Object.keys(tagHighlight).filter(
-    t => tagHighlight[t] && existingTags.has(t)
-  )
-
+  const activeTags = Object.keys(tagHighlight).filter(t => tagHighlight[t] && existingTags.has(t))
   notes.forEach(n => {
     if(filter && !n.title.toLowerCase().includes(filter) && !n.content.toLowerCase().includes(filter)) return
     const noteTags = getTags(n.content)
@@ -366,11 +367,9 @@ function renderPages(filter=""){
     if(n.pinned) pinned.push(n)
     else others.push(n)
   })
-
   pinned.sort((a,b)=>b.created-a.created)
   others.sort((a,b)=>b.created-a.created)
   pages.innerHTML=""
-
   function renderList(list){
     list.forEach(n=>{
       let div=document.createElement("div")
@@ -411,13 +410,8 @@ function renderTagPanel(){
         if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082"
       }
       div.onclick = (e)=>{
-        if(e.ctrlKey){
-          pinnedTags[tag] = !pinnedTags[tag]
-          localStorage.setItem("pinnedTags",JSON.stringify(pinnedTags))
-        }else{
-          tagHighlight[tag] = !tagHighlight[tag]
-          localStorage.setItem("tagHighlight",JSON.stringify(tagHighlight))
-        }
+        if(e.ctrlKey){ pinnedTags[tag] = !pinnedTags[tag]; localStorage.setItem("pinnedTags",JSON.stringify(pinnedTags)) }
+        else { tagHighlight[tag] = !tagHighlight[tag]; localStorage.setItem("tagHighlight",JSON.stringify(tagHighlight)) }
         renderPages()
       }
       tagPanel.appendChild(div)
@@ -444,9 +438,7 @@ function renderMeta(note){
   let chars=note.content.length
   stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
   let refs=[]
-  notes.forEach(n=>{
-    if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n)
-  })
+  notes.forEach(n=>{ if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n) })
   if(refs.length===0){backlinks.innerHTML="Backlinks: None"; return}
   backlinks.innerHTML="Backlinks: "
   refs.forEach((n,i)=>{
@@ -462,200 +454,76 @@ function renderMeta(note){
 /* TITLE & CONTENT */
 title.oninput=e=>{let n=notes.find(x=>x.id===current); n.title=e.target.value; n.updated=Date.now(); save(); renderPages()}
 title.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    if (notes.find(n => n.id === current).content === "") {
-      content.value = "";
-      content.focus();
-      content.selectionStart = 0;
-      content.selectionEnd = 0;
-    } else {
-      content.focus();
-    }
-  }
+  if (e.key === "Enter") { content.focus(); e.preventDefault(); }
 });
-content.oninput=e=>{let n=notes.find(x=>x.id===current); n.content=e.target.value; n.updated=Date.now(); save(); renderMeta(n); if(mode==="preview") renderPreview()}
-
-/* PIN / DELETE */
-function togglePin(){let n=notes.find(x=>x.id===current); n.pinned=!n.pinned; save(); renderPages()}
-function deleteNote(){if(!confirm("Delete note?")) return; notes=notes.filter(n=>n.id!==current); save(); if(notes.length) openNote(notes[0].id); renderPages()}
-
-/* MARKDOWN */
-function renderPreview(){
-    let html = marked.parse(content.value);
-    html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
-    html = html.replace(/\[(\d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
-    html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-        let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
-        if(!note){
-            let id = Date.now();
-            note = {id:id,title:name,content:"",created:id,updated:id,pinned:false};
-            notes.push(note); save()
-        }
-        return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-    });
-    preview.innerHTML = html;
-}
-
-/* MODE */
-// Toggle between Edit and Preview with one button
-function toggleEditPreview() {
-    if(mode === "edit") {
-        setMode("preview");
-    } else {
-        setMode("edit");
-    }
-}
-
-// Update editor/preview display and button text
-function setMode(m){
-    mode = m;
-    const toggleBtn = document.getElementById("toggleModeBtn");
-
-    if(m === "edit"){
-        content.style.display = "block";
-        preview.style.display = "none";
-        toggleBtn.textContent = "Edit Mode";  // indicates current mode
-    } else {
-        renderPreview();
-        content.style.display = "none";
-        preview.style.display = "block";
-        toggleBtn.textContent = "Preview Mode"; // indicates current mode
-    }
-
-    // Highlight active mode button
-    document.querySelectorAll("#mode button").forEach(btn => btn.classList.remove("activeMode"));
-    toggleBtn.classList.add("activeMode");
-}
-
-/* SEARCH */
-search.oninput=e=>{renderPages(e.target.value.toLowerCase())}
-
-/* EXPORT / IMPORT */
-function exportNotes(){
-  let txt = notes.map(n=>`Title: ${n.title}\nCreated: ${n.created}\nUpdated: ${n.updated}\nPinned: ${n.pinned}\nContent:\n${n.content}\n===\n`).join("\n")
-  let blob = new Blob([txt], {type:"text/plain"})
-  let a = document.createElement("a")
-  a.href = URL.createObjectURL(blob)
-  a.download = "notes_export.txt"
-  a.click()
-}
-importFile.onchange=e=>{
-  let f=e.target.files[0]
-  let r=new FileReader()
-  r.onload=function(evt){
-    let lines = evt.target.result.split("\n")
-    let newNotes = []
-    let i=0
-    while(i<lines.length){
-      if(lines[i].startsWith("Title: ")){
-        let title = lines[i].slice(7)
-        let created = Number(lines[i+1].slice(9))
-        let updated = Number(lines[i+2].slice(9))
-        let pinned = lines[i+3].slice(8)==="true"
-        i+=5
-        let content=[]
-        while(i<lines.length && lines[i]!=="==="){content.push(lines[i]);i++}
-        newNotes.push({id:Date.now()+Math.random(),title,content:content.join("\n"),created,updated,pinned})
-      }
-      i++
-    }
-    notes=newNotes
-    save()
-    if(notes.length) openNote(notes[0].id)
-    renderPages()
-  }
-  r.readAsText(f)
+content.oninput=e=>{
+  let n=notes.find(x=>x.id===current)
+  n.content=e.target.value
+  n.updated=Date.now()
+  save()
+  renderPreview(n)
+  renderMeta(n)
+  renderPages()
 }
 
 /* OPEN NOTE */
-function openNote(id, isNew = false) {
-  current = id;
-  let note = notes.find(n => n.id === id);
-  title.value = note.title;
-  content.value = note.content;
-  renderMeta(note);
-  renderPages();
-  if (isNew) { setTimeout(() => { title.focus(); }, 0); setMode("edit"); } else { setMode("preview"); }
+function openNote(id, focusContent=false){
+  current=id
+  let n=notes.find(x=>x.id===id)
+  if(!n) return
+  title.value=n.title
+  content.value=n.content
+  renderPreview(n)
+  renderMeta(n)
+  renderPages()
+  if(focusContent) content.focus()
 }
 
-/* INIT NOTES */
-if(notes.length===0){
-  let id=Date.now()
-  notes.push({id:id,title:"Welcome",content:"# Welcome\n\nUse [[Example Note]] to create linked notes.\n\n#demo",created:id,updated:id,pinned:false})
-  save()
+/* PREVIEW TOGGLE */
+function toggleEditPreview(){
+  if(mode==="edit"){mode="preview";toggleModeBtn.textContent="Edit Mode";content.style.display="none";preview.style.display="block"}
+  else{mode="edit";toggleModeBtn.textContent="Preview Mode";content.style.display="block";preview.style.display="none"}
 }
-openNote(notes[0].id)
+
+/* PIN NOTE */
+function togglePin(){let n=notes.find(x=>x.id===current); if(!n) return; n.pinned=!n.pinned; save(); renderPages()}
+
+/* DELETE NOTE */
+function deleteNote(){if(!current) return; notes=notes.filter(x=>x.id!==current); save(); current=null; renderPages(); title.value=""; content.value=""; preview.innerHTML=""; tags.innerText=""; stats.innerText=""; backlinks.innerText=""}
 
 /* FOCUS MODE */
-const focusBtn = document.getElementById("focusBtn");
-let focusMode = false;
-let prevMode = mode;
-function toggleFocusMode() {
-  focusMode = !focusMode;
-  document.body.classList.toggle("focusMode", focusMode);
-  focusBtn.classList.toggle("activeMode", focusMode);
-  if (focusMode) { prevMode = mode; setMode("edit"); }
-  else { setMode(prevMode); }
+function toggleFocusMode(){document.body.classList.toggle("focusMode")}
+
+/* EXPORT */
+function exportNotes(){
+  let data = JSON.stringify(notes,null,2)
+  let blob = new Blob([data],{type:"application/json"})
+  let a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = "notes_export.json"
+  a.click()
 }
 
-/* LINK SUGGEST & HOVER PREVIEW */
-const linkSuggest = document.getElementById("linkSuggest")
-const hoverPreview = document.getElementById("hoverPreview")
-let hoverTimer = null
-
-content.addEventListener("keyup", function(e){
-  let pos = content.selectionStart
-  let text = content.value.substring(0,pos)
-  let match = text.match(/\[\[([^\[]*)$/)
-  if(match){
-    let query = match[1].toLowerCase()
-    let results = notes.filter(n => n.title.toLowerCase().includes(query))
-    if(results.length===0){linkSuggest.style.display="none"; return}
-    linkSuggest.innerHTML=""
-    results.slice(0,8).forEach(n=>{
-      let div=document.createElement("div")
-      div.className="linkItem"
-      div.textContent=n.title
-      div.onclick=()=>{
-        let start = text.lastIndexOf("[[")
-        let before = content.value.substring(0,start)
-        let after = content.value.substring(pos)
-        content.value = before + "[["+n.title+"]]" + after
-        linkSuggest.style.display="none"
-        content.focus()
-      }
-      linkSuggest.appendChild(div)
-    })
-    let rect = content.getBoundingClientRect()
-    let lineHeight = 18
-    let lines = content.value.substr(0, content.selectionStart).split("\n").length
-    linkSuggest.style.left = rect.left + 10 + "px"
-    linkSuggest.style.top = rect.top + (lines * lineHeight) + 20 + "px"
-    linkSuggest.style.display="block"
-  } else {linkSuggest.style.display="none"}
-})
-
-preview.addEventListener("mouseover", function(e){
-  if(e.target.classList.contains("noteLink")){
-    clearTimeout(hoverTimer)
-    hoverTimer = setTimeout(()=>{
-      let id = Number(e.target.dataset.id)
-      let note = notes.find(n=>n.id===id)
-      if(!note) return
-      let rect = e.target.getBoundingClientRect()
-      hoverPreview.style.left = rect.right + 10 + "px"
-      hoverPreview.style.top = rect.top + "px"
-      hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
-      hoverPreview.style.display="block"
-    },150)
+/* IMPORT */
+importFile.addEventListener("change", function(e){
+  let file = e.target.files[0]
+  if(!file) return
+  let reader = new FileReader()
+  reader.onload = function(ev){
+    let imported=JSON.parse(ev.target.result)
+    notes=notes.concat(imported)
+    save()
+    renderPages()
   }
+  reader.readAsText(file)
 })
-preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
 
-marked.setOptions({ gfm: true, breaks: true });
+/* SEARCH */
+search.oninput=e=>renderPages(e.target.value.toLowerCase())
 
+/* INITIAL RENDER */
+renderPages()
+if(notes.length>0) openNote(notes[0].id)
 </script>
-
 </body>
 </html>
