@@ -761,18 +761,6 @@ content.addEventListener("keydown", function(e){
 
 })
 
-// --- SINGLE NOTE SHORTCUT (invisible) ---
-const myShortcutNoteTitle = "WorkingHours"; // <-- change to your note title
-
-document.addEventListener("keydown", function(e){
-  // Ctrl + Shift + L
-  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "l"){
-    e.preventDefault();
-    const note = notes.find(n => n.title === myShortcutNoteTitle);
-    if(note) openNote(note.id);
-  }
-});
-
 </script>
 
 </body>
