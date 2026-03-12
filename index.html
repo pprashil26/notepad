@@ -524,7 +524,23 @@ function renderMeta(note){
   let links=getLinks(note.content)
   let words=note.content.split(/\s+/).filter(Boolean).length
   let chars=note.content.length
-  stats.innerText="Words: "+words+" | Chars: "+chars+" | Links: "+links.length+" | Updated: "+new Date(note.updated).toLocaleString()
+
+  // Create the stats text
+  stats.innerHTML = `
+    Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()} 
+    <button id="toggleStatsModeBtn" style="font-size:11px; margin-left:12px; padding:2px 6px; border-radius:6px; border:1px solid #2f7ef7; background:#2f7ef7; color:#fff; cursor:pointer;">
+      ${mode === "edit" ? "Preview" : "Edit"}
+    </button>
+  `;
+
+  // Add click listener to toggle mode
+  const toggleBtn = document.getElementById("toggleStatsModeBtn");
+  toggleBtn.onclick = () => {
+    toggleEditPreview();
+    // Update button text immediately
+    toggleBtn.textContent = mode === "edit" ? "Preview" : "Edit";
+  }
+
   let refs=[]
   notes.forEach(n=>{
     if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n)
