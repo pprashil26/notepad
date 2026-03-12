@@ -389,15 +389,26 @@ body.previewMode #preview {
 </div>
 
   <!-- EDITOR -->
-  <div id="editorCard">
+<!-- EDITOR -->
+<div id="editorCard">
 
+    <!-- Title -->
     <input id="title" placeholder="Title">
+
+    <!-- EDIT / PREVIEW BUTTON -->
+    <div id="mode">
+        <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit / Preview</button>
+    </div>
+
+    <!-- Editor & Preview -->
     <textarea id="content"></textarea>
     <div id="preview"></div>
+
+    <!-- Meta Panels -->
     <div id="tags"></div>
     <div id="stats"></div>
     <div id="backlinks"></div>
-  </div>
+</div>
 </div>
 
 <div id="palette">
@@ -645,6 +656,11 @@ function setMode(m){
         content.style.display = "none";
         preview.style.display = "block";
     }
+	// Update button active state
+const toggleBtn = document.getElementById("toggleModeBtn");
+if(toggleBtn){
+    toggleBtn.classList.toggle("activeMode", m === "edit");
+}
 }
 
 /* SEARCH */
