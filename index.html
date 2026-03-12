@@ -544,15 +544,9 @@ document.getElementById("statsText").textContent =
 
     // Clicking a backlink opens the note in editor only (no preview)
     a.onclick = (e) => {
-      e.preventDefault()
-      current = n.id
-      let linkedNote = notes.find(x => x.id === n.id)
-      title.value = linkedNote.title
-      content.value = linkedNote.content
-      renderMeta(linkedNote)
-      renderPages()
-      content.focus()
-    }
+  e.preventDefault()
+  openNote(n.id)   // <-- use your existing openNote() function
+}
 
     backlinks.appendChild(a)
   })
@@ -895,20 +889,8 @@ content.addEventListener("keydown", function(e){
   }
 
 })
-function openNoteClean(id){
-  current = id
-  let note = notes.find(n => n.id === id)
-
-  // Update editor fields
-  title.value = note.title
-  content.value = note.content
-
-  // Re-render metadata & pages
-  renderMeta(note)
-  renderPages()
-
-  // Render preview only if mode is preview
-  if(mode === "preview") renderPreview()
+function openNoteClean(id) {
+    openNote(id);
 }
 
 </script>
