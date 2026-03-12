@@ -145,8 +145,8 @@ body {
   width: 100%;
   margin: 20px auto;           
   border-radius: 12px;
-  border: 1px solid #e6e6e6;
-  background: #fffde0;  /* soft pale yellow for note card */
+  border: 1px solid #ececec;
+  background: #fcfcfc;  /* ultra minimal note surface */
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
@@ -158,50 +158,29 @@ body {
   box-shadow: 0 6px 20px rgba(47,126,247,0.15);
 }
 
-/* MODE BUTTONS */
-#mode {
-  display: flex;
-  padding: 4px 8px;
-  border-bottom: 1px solid #f0f0f0;
-  gap: 6px;
-  align-items: center;
-}
-#mode button {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  transition: 0.15s;
-  height: 26px;
-}
-#mode button:hover { background: #e8f4ff; border-color: #2f7ef7; }
-#mode button.activeMode { background: #2f7ef7; color: #fff; border-color: #1c5fd1; }
-
-/* EDIT/PREVIEW TOGGLE */
+/* --- EDIT / PREVIEW TOGGLE BUTTON --- */
 #toggleModeBtn {
-  position: relative;
   font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  border: 1px solid #2f7ef7;
-  background: #2f7ef7;
-  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #e2e2e2;
+  background: #fafafa;       /* light minimal style */
+  color: #333;
   cursor: pointer;
+  height: 20px;
+  min-width: auto;
   transition: 0.2s;
-  min-width: 90px;
 }
 
 #toggleModeBtn:hover {
-  background: #1c5fd1;
-  border-color: #1c5fd1;
+  background: #f5f5f5;
+  border-color: #d6d6d6;
 }
 
 #toggleModeBtn.activeMode {
-  background: #2f7ef7;
-  color: #fff;
-  border-color: #2f7ef7;
+  background: #f0f0f0;
+  border-color: #b0b0b0;
+  color: #111;
 }
 
 /* TITLE & CONTENT */
@@ -211,7 +190,7 @@ body {
   border: none;
   outline: none;
   padding: 16px 20px 8px 20px;
-  background: #fffde0;  /* same soft yellow as editor card */
+  background: #fcfcfc;  /* same minimal background as editor card */
   width: 100%;
   text-align: left;
 }
@@ -229,13 +208,7 @@ body {
   width: 100%;
   margin: auto;                 /* center text area */
   word-wrap: break-word;
-background: repeating-linear-gradient(
-    to bottom,
-    #fffde0,
-    #fffde0 28px,
-    #fff9d4 28px,
-    #fff9d4 29px
-  );
+background: #fcfcfc;
   resize: none;
 }
 
@@ -250,7 +223,7 @@ background: repeating-linear-gradient(
   max-width: 560px;
   width: 100%;
   margin: auto;
-  background: #fffde0;  /* match editor card */
+  background: #fcfcfc;  /* match editor card */
   border-radius: 8px;
 }
 
@@ -315,13 +288,6 @@ body.focusMode #editorCard {
 table { border-collapse: collapse; }
 td, th { border: 1px solid #ccc; padding: 6px; text-align: center; }
 
-body.focusMode #editorCard {
-  max-width: 600px;
-  width: 100%;
-  margin: 40px auto;             /* vertical spacing for notebook look */
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
 
 /* --- EDIT MODE --- */
 body.editMode #editorCard {
@@ -329,14 +295,9 @@ body.editMode #editorCard {
 }
 
 body.editMode #content {
-  background: repeating-linear-gradient(
-    to bottom,
-    #fffdf0,   /* very light journal yellow */
-    #fffdf0 28px,
-    #fff9d4 28px,
-    #fff9d4 29px
-  );
+  background: #fcfcfc;
 }
+
 
 /* --- PREVIEW MODE --- */
 body.previewMode #editorCard {
@@ -344,7 +305,7 @@ body.previewMode #editorCard {
 }
 
 body.previewMode #preview {
-  background: #fffde0;  /* original pale yellow */
+  background: #fcfcfc;  /* minimal editor background */
 }
 
 /* --- MODE BANNER --- */
@@ -355,7 +316,7 @@ body.previewMode #preview {
   font-size: 12px;
   font-weight: 600;
   color: #555;
-  background: #fff9a8;  /* soft accent yellow */
+  background: #f3f3f3;
   padding: 4px 0;
   border-bottom: 1px solid #eee;
   border-radius: 12px 12px 0 0;  /* match card */
@@ -374,26 +335,6 @@ body.previewMode #preview {
   width: 100%;
 }
 
-#stats #toggleModeBtn {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 6px;
-  border: 1px solid #e2e2e2;
-  background: #fafafa;
-  color: #333;
-  cursor: pointer;
-  height: 20px;
-  min-width: auto;
-}
-
-#stats #toggleModeBtn:hover {
-  background: #f5f5f5;
-}
-
-#stats #toggleModeBtn.activeMode {
-  background: #f0f0f0;
-  border-color: #d6d6d6;
-}
 </style>
 </head>
 <body>
@@ -442,7 +383,7 @@ body.previewMode #preview {
     <div id="tags"></div>
     <div id="stats">
   <span id="statsText">Words: 0 | Chars: 0 | Links: 0 | Updated: --</span>
-  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit / Preview</button>
+  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit</button>
 </div>
     <div id="backlinks"></div>
 </div>
@@ -475,6 +416,7 @@ function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.r
 const sidebar = document.getElementById("sidebar");
 const sidebarActions = document.getElementById("sidebarActions");
 const tagPanel = document.getElementById("tagPanel");
+const pages = document.getElementById("pages")
 
 // Remove tagPanel from current position and insert before sidebarActions
 sidebar.insertBefore(tagPanel, sidebarActions);
@@ -510,7 +452,7 @@ function renderPages(filter=""){
       let d=new Date(n.created)
       date.textContent=`${d.getDate()}/${d.getMonth()+1}`
       date.className="dateLabel"
-      let p=document.createElement("span");p.className="pin";p.textContent=n.pinned?"??":""
+      let p=document.createElement("span");p.className="pin";p.textContent = n.pinned ? "📌" : ""
       div.appendChild(t);div.appendChild(date);div.appendChild(p)
       div.onclick=()=>openNote(n.id)
       pages.appendChild(div)
@@ -537,7 +479,7 @@ function renderTagPanel(){
       if(tagHighlight[tag]) div.style.backgroundColor = "#fff9c4"
       if(pinnedTags[tag]){
         div.classList.add("pinned")
-        div.textContent = `? ${tag} (${tagCount[tag]})`
+        div.textContent = `📌 ${tag} (${tagCount[tag]})`
         if(tagHighlight[tag]) div.style.backgroundColor = "#ffe082"
       }
       div.onclick = (e)=>{
@@ -578,8 +520,7 @@ function renderMeta(note) {
   let chars = note.content.length
 
 document.getElementById("statsText").textContent =
-    `Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()};
-  `
+`Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()}`
 
   // Backlinks - notes that reference this note
   let refs = []
@@ -679,8 +620,8 @@ function setMode(m){
 
     // update card banner
     editorCard.setAttribute("data-mode", m === "edit" ? "Edit Mode" : "Preview Mode");
-
-    // toggle body classes for shadow/background changes
+	
+	// toggle body classes for shadow/background changes
     document.body.classList.toggle("editMode", mode === "edit");
     document.body.classList.toggle("previewMode", mode === "preview");
 
@@ -697,6 +638,7 @@ function setMode(m){
 const toggleBtn = document.getElementById("toggleModeBtn");
 if(toggleBtn){
     toggleBtn.classList.toggle("activeMode", m === "edit");
+	toggleBtn.textContent = (m === "edit") ? "Preview" : "Edit"
 }
 }
 
@@ -760,7 +702,6 @@ if(notes.length===0){
 openNote(notes[0].id)
 
 /* FOCUS MODE */
-const focusBtn = document.getElementById("focusBtn");
 let focusMode = false;
 let prevMode = mode;
 
@@ -819,6 +760,14 @@ preview.addEventListener("mouseout", function(e){if(e.target.classList.contains(
 
 document.addEventListener("keydown", function(e){
 
+    // Ctrl + / → focus search
+  if(e.ctrlKey && e.key === "/"){
+    e.preventDefault()
+    document.getElementById("search").focus()
+    document.getElementById("search").select()
+    return
+  }
+  
   // Ctrl + Z → Undo
   if(e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === "z"){
     e.preventDefault()
