@@ -520,39 +520,52 @@ newPage.onclick = () => {
 
 /* META PANELS */
 function renderMeta(note){
-  tags.innerText="Tags: "+getTags(note.content).join(" ")
-  let links=getLinks(note.content)
-  let words=note.content.split(/\s+/).filter(Boolean).length
-  let chars=note.content.length
+  // Show tags
+  tags.innerText = "Tags: " + getTags(note.content).join(" ")
 
-  // Create the stats text
+  // Stats
+  let links = getLinks(note.content)
+  let words = note.content.split(/\s+/).filter(Boolean).length
+  let chars = note.content.length
+
   stats.innerHTML = `
     Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()} 
     <button id="toggleStatsModeBtn" style="font-size:11px; margin-left:12px; padding:2px 6px; border-radius:6px; border:1px solid #2f7ef7; background:#2f7ef7; color:#fff; cursor:pointer;">
       ${mode === "edit" ? "Preview" : "Edit"}
     </button>
-  `;
+  `
 
-  // Add click listener to toggle mode
-  const toggleBtn = document.getElementById("toggleStatsModeBtn");
+  // Toggle button listener
+  const toggleBtn = document.getElementById("toggleStatsModeBtn")
   toggleBtn.onclick = () => {
-    toggleEditPreview();
-    // Update button text immediately
-    toggleBtn.textContent = mode === "edit" ? "Preview" : "Edit";
+    toggleEditPreview()
+    toggleBtn.textContent = mode === "edit" ? "Preview" : "Edit"
   }
 
-  let refs=[]
-  notes.forEach(n=>{
-    if(n.id!==note.id && getLinks(n.content).includes(note.title)) refs.push(n)
+  // Backlinks
+  let refs = []
+  notes.forEach(n => {
+    if(n.id !== note.id && getLinks(n.content).includes(note.title)) refs.push(n)
   })
-  if(refs.length===0){backlinks.innerHTML="Backlinks: None"; return}
-  backlinks.innerHTML="Backlinks: "
-  refs.forEach((n,i)=>{
-    let a=document.createElement("a")
-    a.href="#"
-    a.textContent=n.title
-    a.style.marginRight="6px"
-    a.onclick=(e)=>{e.preventDefault(); openNote(n.id)}
+
+  backlinks.innerHTML = "Backlinks: "
+  if(refs.length === 0){
+    backlinks.innerHTML += "None"
+    return
+  }
+
+  refs.forEach(n => {
+    let a = document.createElement("a")
+    a.href = "#"
+    a.textContent = n.title
+    a.style.marginRight = "6px"
+
+    // Use new function to open note cleanly
+    a.onclick = (e) => {
+      e.preventDefault()
+      openNoteClean(n.id)
+    }
+
     backlinks.appendChild(a)
   })
 }
@@ -580,19 +593,27 @@ function deleteNote(){if(!confirm("Delete note?")) return; notes=notes.filter(n=
 
 /* MARKDOWN */
 function renderPreview(){
-    let html = marked.parse(content.value);
-    html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
-    html = html.replace(/\[(\d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>');
-    html = html.replace(/\[\[(.*?)\]\]/g,function(_,name){
-        let note = notes.find(n=>n.title.toLowerCase() === name.toLowerCase())
-        if(!note){
-            let id = Date.now();
-            note = {id:id,title:name,content:"",created:id,updated:id,pinned:false};
-            notes.push(note); save()
-        }
-        return "<a href='#' class='noteLink' data-id='"+note.id+"' onclick=\"openNote("+note.id+")\">"+name+"</a>"
-    });
-    preview.innerHTML = html;
+  let html = marked.parse(content.value)
+  
+  // Timestamp styling
+  html = html.replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>')
+  html = html.replace(/\[(\d{2}:\d{2})\]/g,'<span class="timestamp">[$1]</span>')
+
+  // Internal note links
+  html = html.replace(/\[\[(.*?)\]\]/g, function(_, name){
+    let note = notes.find(n => n.title.toLowerCase() === name.toLowerCase())
+    if(!note){
+      let id = Date.now()
+      note = {id:id,title:name,content:"",created:id,updated:id,pinned:false}
+      notes.push(note)
+      save()
+    }
+
+    // Clicking a link opens note without breaking original preview
+    return `<a href="#" class='noteLink' data-id='${note.id}' onclick="openNoteClean(${note.id})">${name}</a>`
+  })
+
+  preview.innerHTML = html
 }
 
 /* MODE */
@@ -887,6 +908,21 @@ content.addEventListener("keydown", function(e){
   }
 
 })
+function openNoteClean(id){
+  current = id
+  let note = notes.find(n => n.id === id)
+
+  // Update editor fields
+  title.value = note.title
+  content.value = note.content
+
+  // Re-render metadata & pages
+  renderMeta(note)
+  renderPages()
+
+  // Render preview only if mode is preview
+  if(mode === "preview") renderPreview()
+}
 
 </script>
 
