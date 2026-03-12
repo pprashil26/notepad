@@ -519,51 +519,50 @@ newPage.onclick = () => {
 };
 
 /* META PANELS */
-function renderMeta(note){
-  // Show tags
+/* META PANELS CLEANED - BACKLINKS WITHOUT PREVIEW */
+function renderMeta(note) {
+  // Display tags
   tags.innerText = "Tags: " + getTags(note.content).join(" ")
 
-  // Stats
+  // Calculate stats
   let links = getLinks(note.content)
   let words = note.content.split(/\s+/).filter(Boolean).length
   let chars = note.content.length
 
   stats.innerHTML = `
-    Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()} 
-    <button id="toggleStatsModeBtn" style="font-size:11px; margin-left:12px; padding:2px 6px; border-radius:6px; border:1px solid #2f7ef7; background:#2f7ef7; color:#fff; cursor:pointer;">
-      ${mode === "edit" ? "Preview" : "Edit"}
-    </button>
+    Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()}
   `
 
-  // Toggle button listener
-  const toggleBtn = document.getElementById("toggleStatsModeBtn")
-  toggleBtn.onclick = () => {
-    toggleEditPreview()
-    toggleBtn.textContent = mode === "edit" ? "Preview" : "Edit"
-  }
-
-  // Backlinks
+  // Backlinks - notes that reference this note
   let refs = []
   notes.forEach(n => {
-    if(n.id !== note.id && getLinks(n.content).includes(note.title)) refs.push(n)
+    if (n.id !== note.id && getLinks(n.content).includes(note.title)) {
+      refs.push(n)
+    }
   })
 
-  backlinks.innerHTML = "Backlinks: "
-  if(refs.length === 0){
-    backlinks.innerHTML += "None"
+  if (refs.length === 0) {
+    backlinks.innerHTML = "Backlinks: None"
     return
   }
 
+  backlinks.innerHTML = "Backlinks: "
   refs.forEach(n => {
     let a = document.createElement("a")
     a.href = "#"
     a.textContent = n.title
     a.style.marginRight = "6px"
 
-    // Use new function to open note cleanly
+    // Clicking a backlink opens the note in editor only (no preview)
     a.onclick = (e) => {
       e.preventDefault()
-      openNoteClean(n.id)
+      current = n.id
+      let linkedNote = notes.find(x => x.id === n.id)
+      title.value = linkedNote.title
+      content.value = linkedNote.content
+      renderMeta(linkedNote)
+      renderPages()
+      content.focus()
     }
 
     backlinks.appendChild(a)
