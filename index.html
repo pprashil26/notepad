@@ -356,7 +356,33 @@ body.previewMode #preview {
   border-bottom: 1px solid #eee;
   border-radius: 12px 12px 0 0;  /* match card */
 }
+#stats {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-top: 1px solid #eee;
+  color: #555;
+  opacity: 0.85;
+  max-width: 900px;
+  margin: auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;  /* stats on left, button on right */
+  align-items: center;
+}
 
+#stats #toggleModeBtn {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid #2f7ef7;
+  background: #2f7ef7;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  height: 22px;
+}
+#stats #toggleModeBtn:hover { background: #1c5fd1; border-color: #1c5fd1; }
+#stats #toggleModeBtn.activeMode { background: #2f7ef7; border-color: #2f7ef7; }
 </style>
 </head>
 <body>
@@ -378,7 +404,6 @@ body.previewMode #preview {
     <div class="sideAction" onclick="exportNotes()">Export (Ctrl+X)</div>
     <div class="sideAction" onclick="document.getElementById('importFile').click()">Import (Ctrl+I)</div>
 
-    <div class="sideAction" onclick="toggleEditPreview()">Edit / Preview (Ctrl+E)</div>
     <div class="sideAction" onclick="togglePin()">Pin</div>
     <div class="sideAction" onclick="deleteNote()">Delete</div>
     <div class="sideAction" onclick="toggleFocusMode()">Focus (Ctrl+F)</div>
@@ -396,9 +421,7 @@ body.previewMode #preview {
     <input id="title" placeholder="Title">
 
     <!-- EDIT / PREVIEW BUTTON -->
-    <div id="mode">
-        <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit / Preview</button>
-    </div>
+
 
     <!-- Editor & Preview -->
     <textarea id="content"></textarea>
@@ -406,7 +429,10 @@ body.previewMode #preview {
 
     <!-- Meta Panels -->
     <div id="tags"></div>
-    <div id="stats"></div>
+    <div id="stats">
+  <span id="statsText">Words: 0 | Chars: 0 | Links: 0 | Updated: --</span>
+  <button id="toggleModeBtn" onclick="toggleEditPreview()">Edit / Preview</button>
+</div>
     <div id="backlinks"></div>
 </div>
 </div>
@@ -540,8 +566,8 @@ function renderMeta(note) {
   let words = note.content.split(/\s+/).filter(Boolean).length
   let chars = note.content.length
 
-  stats.innerHTML = `
-    Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()}
+document.getElementById("statsText").textContent =
+    `Words: ${words} | Chars: ${chars} | Links: ${links.length} | Updated: ${new Date(note.updated).toLocaleString()};
   `
 
   // Backlinks - notes that reference this note
