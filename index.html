@@ -423,6 +423,14 @@ function save(){localStorage.setItem("markdownNotes",JSON.stringify(notes))}
 function getTags(text){let m=text.match(/#\w+/g);return m?[...new Set(m)]:[]}
 function getLinks(text){let m=text.match(/\[\[(.*?)\]\]/g);return m?m.map(v=>v.replace("[[","").replace("]]","")):[]}
 
+// Move tagPanel above sidebarActions
+const sidebar = document.getElementById("sidebar");
+const sidebarActions = document.getElementById("sidebarActions");
+const tagPanel = document.getElementById("tagPanel");
+
+// Remove tagPanel from current position and insert before sidebarActions
+sidebar.insertBefore(tagPanel, sidebarActions);
+
 // --- RENDER PAGES & TAGS ---
 function renderPages(filter=""){
   let pinned=[],others=[]
