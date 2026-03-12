@@ -319,6 +319,44 @@ body.focusMode #editorCard {
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
+/* --- EDIT MODE --- */
+body.editMode #editorCard {
+  box-shadow: 0 6px 18px rgba(47, 126, 247, 0.2); /* slightly stronger shadow */
+}
+
+body.editMode #content {
+  background: repeating-linear-gradient(
+    to bottom,
+    #fffdf0,   /* very light journal yellow */
+    #fffdf0 28px,
+    #fff9d4 28px,
+    #fff9d4 29px
+  );
+}
+
+/* --- PREVIEW MODE --- */
+body.previewMode #editorCard {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* softer shadow */
+}
+
+body.previewMode #preview {
+  background: #fffde0;  /* original pale yellow */
+}
+
+/* --- MODE BANNER --- */
+#editorCard::before {
+  content: attr(data-mode);
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  background: #fff9a8;  /* soft accent yellow */
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  border-radius: 12px 12px 0 0;  /* match card */
+}
+
 </style>
 </head>
 <body>
@@ -546,6 +584,13 @@ function toggleEditPreview() {
 // Update editor/preview display and button text
 function setMode(m){
     mode = m;
+
+    // update card banner
+    editorCard.setAttribute("data-mode", m === "edit" ? "Edit Mode" : "Preview Mode");
+
+    // toggle body classes for shadow/background changes
+    document.body.classList.toggle("editMode", mode === "edit");
+    document.body.classList.toggle("previewMode", mode === "preview");
 
     if(m === "edit"){
         content.style.display = "block";
