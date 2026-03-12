@@ -357,6 +357,9 @@ body.previewMode #preview {
   border-radius: 12px 12px 0 0;  /* match card */
 }
 #stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;  /* space between text and button */
   padding: 4px 8px;
   font-size: 11px;
   border-top: 1px solid #eee;
@@ -365,9 +368,6 @@ body.previewMode #preview {
   max-width: 900px;
   margin: auto;
   width: 100%;
-  display: flex;
-  justify-content: space-between;  /* stats on left, button on right */
-  align-items: center;
 }
 
 #stats #toggleModeBtn {
