@@ -405,7 +405,7 @@ body.previewMode #preview {
   <div id="paletteList"></div>
 </div>
 <div id="linkSuggest"></div>
-<div id="hoverPreview"></div>
+
 
 <script>
 let notes = JSON.parse(localStorage.getItem("markdownNotes") || "[]")
@@ -760,21 +760,7 @@ content.addEventListener("keyup", function(e){
   } else {linkSuggest.style.display="none"}
 })
 
-preview.addEventListener("mouseover", function(e){
-  if(e.target.classList.contains("noteLink")){
-    clearTimeout(hoverTimer)
-    hoverTimer = setTimeout(()=>{
-      let id = Number(e.target.dataset.id)
-      let note = notes.find(n=>n.id===id)
-      if(!note) return
-      let rect = e.target.getBoundingClientRect()
-      hoverPreview.style.left = rect.right + 10 + "px"
-      hoverPreview.style.top = rect.top + "px"
-      hoverPreview.innerHTML = marked.parse(note.content.slice(0,300))
-      hoverPreview.style.display="block"
-    },150)
-  }
-})
+
 preview.addEventListener("mouseout", function(e){if(e.target.classList.contains("noteLink")){clearTimeout(hoverTimer); hoverPreview.style.display="none"}})
 /* KEYBOARD SHORTCUTS */
 
