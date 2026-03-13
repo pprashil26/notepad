@@ -893,43 +893,6 @@ function openNoteClean(id) {
     openNote(id);
 }
 
-(() => {
-  console.log("🔹 Starting localStorage restore scan...");
-
-  // Backup current markdownNotes first
-  const currentNotes = localStorage.getItem("markdownNotes");
-  if(currentNotes){
-    localStorage.setItem("markdownNotes_backup_" + Date.now(), currentNotes);
-    console.log("✅ Current markdownNotes backed up.");
-  }
-
-  let restored = false;
-
-  // Scan all keys in localStorage
-  Object.keys(localStorage).forEach(key => {
-    if(key === "markdownNotes") return; // skip current key
-
-    try {
-      const data = JSON.parse(localStorage.getItem(key));
-      // Check if data looks like notes array
-      if(Array.isArray(data) && data.length && data[0].hasOwnProperty("title") && data[0].hasOwnProperty("content")){
-        // Found potential old notes
-        console.log(`⚡ Found old notes under key: "${key}"`);
-        localStorage.setItem("markdownNotes", JSON.stringify(data));
-        restored = true;
-      }
-    } catch(e){
-      // ignore non-JSON
-    }
-  });
-
-  if(restored){
-    console.log("🎉 Old notes restored successfully. Refresh the page to see them.");
-  } else {
-    console.log("❌ No old notes found in localStorage. Maybe they were cleared or overwritten.");
-  }
-})();
-
 </script>
 
 </body>
